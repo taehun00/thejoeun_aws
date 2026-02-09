@@ -20,11 +20,11 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
-        working-directory: pawject4_back   # ✅ 수정
+        working-directory: pawject4_back
 
       - name: Build Spring Boot App
         run: ./gradlew clean build -x test
-        working-directory: pawject4_back   # ✅ 수정
+        working-directory: pawject4_back
 
       - name: Debug Backend Files
         run: |
@@ -202,3 +202,4 @@ jobs:
             pm2 delete frontend || true
             pm2 start npm --name "frontend" -- run start
 
+# .
