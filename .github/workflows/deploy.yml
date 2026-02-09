@@ -108,10 +108,11 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /home/ubuntu/app
+            cd /home/ubuntu/app/pawject4_back/build/libs
             pm2 delete backend || true
             export $(cat /home/ubuntu/app/.env | xargs)
-            pm2 start java --name backend -- -jar $(basename ${{ env.JAR_FILE }})
+            pm2 start java --name backend -- -jar pawject4-0.0.1-SNAPSHOT.jar
+
 
   frontend:
     runs-on: ubuntu-latest
