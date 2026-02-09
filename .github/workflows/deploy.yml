@@ -1,9 +1,9 @@
-name: Deploy Fullstack App   # 워크플로우 이름 정의
+name: Deploy Fullstack App
 
 on:
   push:
     branches:
-      - main   # main 브랜치에 push 될 때만 실행
+      - main
 
 jobs:
   backend:
@@ -28,9 +28,7 @@ jobs:
 
       - name: Debug Backend Files
         run: |
-          echo "=== pawject4_back 디렉터리 ==="
           ls -al pawject4_back
-          echo "=== build/libs 디렉터리 ==="
           ls -al pawject4_back/build/libs
 
       - name: Find JAR file (fat jar만 선택)
@@ -73,19 +71,9 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "pawject4_back/build/libs/back-0.0.1-SNAPSHOT.jar"
+          source: "${{ env.JAR_FILE }}"
           target: "/home/ubuntu/app"
 
-
-      - name: Debug EC2 app directory
-        uses: appleboy/ssh-action@v0.1.7   # .EC2 파일확인
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: ls -lh /home/ubuntu/app/pawject4_back/build/libs
-
- 
       - name: Copy Backend .env to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -95,10 +83,8 @@ jobs:
           source: "pawject4_back/.env"
           target: "/home/ubuntu/app"
 
-
-
       - name: Wait for Oracle & Redis readiness on EC2
-        uses: appleboy/ssh-action@v0.1.7    # db와 redis 준비상태 확인
+        uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
@@ -115,17 +101,17 @@ jobs:
               sleep 10
             done
 
-      - name: Run Backend on EC2 with pm2 (build/libs에서 실행)
+      - name: Run Backend on EC2 with pm2
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /home/ubuntu/app/back/build/libs
+            cd /home/ubuntu/app
             pm2 delete backend || true
-            export $(cat /home/ubuntu/app/pawject4_back/.env | xargs)
-            pm2 start java --name backend -- -jar back-0.0.1-SNAPSHOT.jar
+            export $(cat /home/ubuntu/app/.env | xargs)
+            pm2 start java --name backend -- -jar $(basename ${{ env.JAR_FILE }})
 
   frontend:
     runs-on: ubuntu-latest
@@ -138,12 +124,10 @@ jobs:
         with:
           node-version: '18'
 
-      # 🔑 Secrets 기반으로 .env.production 먼저 생성
       - name: Create Frontend .env.production
         run: |
           echo "NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL }}" > pawject4_front/.env.production
 
-      # 빌드 전에 .env.production이 반영되도록 순서 조정   
       - name: Build Frontend
         run: |
           npm install
@@ -152,9 +136,9 @@ jobs:
 
       - name: Debug Frontend Files
         run: |
-          ls -al front
-          ls -al front/.next || true
-          ls -al front/public || true
+          ls -al pawject4_front
+          ls -al pawject4_front/.next || true
+          ls -al pawject4_front/public || true
 
       - name: Ensure front directory exists on EC2
         uses: appleboy/ssh-action@v0.1.7
@@ -164,11 +148,13 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: mkdir -p /home/ubuntu/front
 
-      # 빌드 결과물(.next, public, package.json,   .env.production)을 압축     
       - name: Archive frontend build
         run: |
           cd pawject4_front
           tar -czf ../frontend-build.tar.gz .next public package.json .env.production
+
+      - name: Debug frontend archive
+        run: ls -lh frontend-build.tar.gz || echo "frontend-build.tar.gz not found"
 
       - name: Copy frontend archive to EC2
         uses: appleboy/scp-action@v0.1.7
@@ -179,7 +165,7 @@ jobs:
           source: "frontend-build.tar.gz"
           target: "/home/ubuntu/front"
 
-      - name: Extract archive on EC2 (기존 빌드 정리 후)
+      - name: Extract archive on EC2
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -201,5 +187,3 @@ jobs:
             npm install --production
             pm2 delete frontend || true
             pm2 start npm --name "frontend" -- run start
-
-# .
