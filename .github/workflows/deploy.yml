@@ -74,14 +74,24 @@ jobs:
           source: "${{ env.JAR_FILE }}"
           target: "/home/ubuntu/app"
 
-      - name: Copy Backend .env to EC2
-        uses: appleboy/scp-action@v0.1.7
+      - name: Create .env on EC2
+        uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "pawject4_back/.env"
-          target: "/home/ubuntu/app"
+          script: |
+            cat <<EOF > /home/ubuntu/app/.env
+            DB_USERNAME=${{ secrets.DB_USERNAME }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}
+            NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}
+            NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}
+            EOF
+
 
       - name: Wait for Oracle & Redis readiness on EC2
         uses: appleboy/ssh-action@v0.1.7
