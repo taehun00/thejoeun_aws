@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+	<mapper namespace="com.pawject.dao.food.BrandDao">
+	<resultMap   type="com.pawject.dto.food.BrandDto" id="brandMap">
+
+	<result property="brandid"	column="BRANDID"/>
+	<result property="brandname"	column="BRANDNAME"/>
+	<result property="country"	column="COUNTRY"/>
+	<result property="brandtype"	column="BRANDTYPE"/>
+	<result property="origin"	column="ORIGIN"/>
+	<result property="brandinfo"	column="BRANDINFO"/>
+
+	</resultMap>
+
+		<select resultMap="brandMap" id="brandSelectAll" >
+		select * from foodbrand
+		</select>
+
+	</mapper>

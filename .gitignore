@@ -1,0 +1,79 @@
+# =========================
+# OS / 에디터 관련
+# =========================
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.tmp
+.vscode/
+.idea/
+
+# =========================
+# Node.js / Next.js
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.next/
+out/
+dist/
+coverage/
+.env*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# =========================
+# Java / Spring Boot
+# =========================
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+*.log
+target/
+build/
+.gradle/
+.gradle-cache/
+!gradle-wrapper.jar   # gradle wrapper는 
+
+# =========================
+# Docker
+# =========================
+*.pid
+*.seed
+*.pid.lock
+
+# =========================
+# Logs / Temp
+# =========================
+logs/
+*.log
+*.gz
+*.zip
+*.tar
+*.tgz
+*.bak
+*.tmp
+
+# =========================
+# OS Key / SSH
+# =========================
+*.pem
+*.key
+*.crt
+*.pub
+
+# =========================
+# Misc
+# =========================
+coverage/
+.cache/
+.eslintcache
+stylelintcache
+/.metadata/

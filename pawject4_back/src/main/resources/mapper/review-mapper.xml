@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="com.pawject.dao.review.ReviewDao">
+	<resultMap type="com.pawject.dto.review.ReviewDto" id="ReviewMap">
+		<result property="reviewid"	column="REVIEWID"/>
+		<result property="userid"	column="USERID"/>
+		<result property="brandid"	column="BRANDID"/>
+		<result property="foodid"	column="FOODID"/>
+		<result property="reviewimg"	column="REVIEWIMG"/>
+		<result property="rating"	column="RATING"/>
+		<result property="title"	column="TITLE"/>
+		<result property="reviewcomment"	column="REVIEWCOMMENT"/>
+		<result property="createdat"	column="CREATEDAT"/>
+		<result property="updatedat"	column="UPDATEDAT"/>
+
+		<result property="nickname"	column="NICKNAME"/>
+		<result property="brandname"	column="BRANDNAME"/>
+		<result property="foodname"	column="FOODNAME"/>
+		<result property="foodimg"	column="FOODIMG"/>
+		<result property="pettypeid"	column="PETTYPEID"/>
+		
+		    <!-- 이미지 리스트 매핑 추가 -->
+		<collection property="reviewimglist"
+            ofType="com.pawject.dto.review.ReviewImgDto"
+            select="com.pawject.dao.review.ReviewImgDao.reviewimgSelect"
+            column="reviewid"/>
+	</resultMap>
+	
+	<!-- 전체 리스트+디테일 -->
+	<select  resultMap="ReviewMap" id="reviewSelectAll">
+		 select r.reviewid as reviewid, 
+				 f.pettypeid as pettypeid, 
+		 		fb.brandname as brandname, 
+		 		f.foodid as foodid,
+		 		f.foodname as foodname, 
+		 		f.foodimg as foodimg, 
+		 		r.rating as rating, 
+		 		r.title as title, 
+		 		r.reviewcomment as reviewcomment, 
+		 		u.nickname as nickname, 
+		 		u.userid as userid,
+		        TO_CHAR(r.createdat, 'YYYY-MM-DD') as createdat, 
+        		TO_CHAR(r.updatedat , 'YYYY-MM-DD') as updatedat
+			from review r left join food f on(r.foodid=f.foodid)
+               join foodbrand fb on(r.brandid=fb.brandid)
+               left join users u on(u.userid=r.userid)
+            order by reviewid desc
+	</select>
+	
+	<!-- 특정 리뷰 선택 -->
+	<select resultType="ReviewDto"  id="reviewSelect" parameterType="int">
+		select * from review where reviewid=#{reviewid}
+	</select>
+	
+	<!-- 신규 -->
+	<insert id="reviewInsert" parameterType="ReviewDto">
+	    <selectKey keyProperty="reviewid" order="AFTER" resultType="int">
+	        SELECT review_seq.currval FROM dual
+	    </selectKey>
+		insert into review (reviewid, userid, brandid, foodid, rating, title, reviewcomment)
+        values(review_seq.nextval, #{userid},#{brandid},#{foodid},#{rating},#{title},#{reviewcomment})
+	</insert>	
+
+	
+	<!-- 수정 -->
+	<update id="reviewUpdate" parameterType="ReviewDto">
+		update review set brandid=#{brandid}, foodid=#{foodid}, 
+						rating=#{rating}, title=#{title}, 
+						reviewcomment=#{reviewcomment}, updatedat=sysdate
+			where reviewid=#{reviewid}  and userid = #{userid}
+	</update>
+	
+	<!-- 삭제 -->
+	<delete id="reviewDelete" parameterType="ReviewDto">
+		delete from review where reviewid=#{reviewid}   and userid = #{userid}
+	</delete>
+	
+	
+	<!-- 페이징 -->
+	<select resultMap="ReviewMap" id="reviewSelect10"  parameterType="java.util.Map">
+                           
+                  select *
+                from(select row_number() over(
+					<choose>
+					  <when test="condition == 'old'">
+					    order by r.createdat asc, r.reviewid asc
+					  </when>
+					  <otherwise>
+					    order by r.createdat desc, r.reviewid desc
+					  </otherwise>
+					</choose>
+	                ) as rnum,
+                             r.reviewid,  fb.brandname ,  f.foodid, f.foodname,    f.foodimg , f.pettypeid ,
+                            r.rating,    r.title ,   r.reviewcomment,  u.nickname,   u.userid,
+                            TO_CHAR(r.createdat, 'YYYY-MM-DD') as createdat, 
+                            TO_CHAR(r.updatedat , 'YYYY-MM-DD') as updatedat
+                        from review r left join food f on(r.foodid=f.foodid)
+                           join foodbrand fb on(r.brandid=fb.brandid)
+                           left join users u on(u.userid=r.userid)        ) a
+                           where a.rnum between #{start} and #{end}
+	</select>
+	
+	<select resultType="int" id="reviewSelectCnt">
+		select count(*) from review
+	</select>
+	
+	
+	<!-- 서치 + 페이징 -->
+		<select  resultMap="ReviewMap" id="reviewsearch" parameterType="java.util.HashMap">
+                  select *
+                from(select row_number() over(
+							<choose>
+							  <when test="condition == 'old'">
+							    order by r.createdat asc, r.reviewid asc
+							  </when>
+							  <when test="condition == 'new'">
+							    order by r.createdat desc, r.reviewid desc
+							  </when>							  
+							  <otherwise>
+							    order by r.createdat desc, r.reviewid desc
+							  </otherwise>
+							</choose>
+							) as rnum,
+                             r.reviewid,  fb.brandname ,  f.foodid, f.foodname,    f.foodimg , f.pettypeid,
+                            r.rating,    r.title ,   r.reviewcomment,  u.nickname,   u.userid,
+                            TO_CHAR(r.createdat, 'YYYY-MM-DD') as createdat, 
+                            TO_CHAR(r.updatedat , 'YYYY-MM-DD') as updatedat
+                        from review r left join food f on(r.foodid=f.foodid)
+                           join foodbrand fb on(r.brandid=fb.brandid)
+                           left join users u on(u.userid=r.userid)      
+                                    <where>
+                        <choose>
+                            <when test="searchType == 'brandname'">
+                                AND lower(fb.brandname) like #{search}
+                            </when>
+                    
+                            <when test="searchType == 'foodname'">
+                                AND f.foodname like #{search}
+                            </when>
+                    
+                            <when test="searchType == 'pettypeid'">
+                                AND f.pettypeid = #{search}
+                            </when>
+		                    <when test="searchType == 'title'">
+					            AND r.title like #{search}
+					        </when>	
+                            <when test="searchType == 'reviewcomment'">
+                                AND r.reviewcomment like #{search}
+                            </when>
+                    
+					        <otherwise>
+					          AND (
+					            lower(r.title) like #{search}
+					            OR lower(r.reviewcomment) like #{search}
+					          )
+					        </otherwise>
+                        </choose>
+                    </where>
+     
+                           ) a
+                           where a.rnum between #{start} and #{end}
+	</select>
+	
+	
+	
+		<select  resultType="int" id="reviewsearchcnt" parameterType="java.util.HashMap">
+			select count(*)
+			from review r left join food f on(r.foodid=f.foodid)
+               join foodbrand fb on(r.brandid=fb.brandid)
+               left join users u on(u.userid=r.userid)
+			<where>
+			    <choose>
+			        <when test="searchType == 'brandname'">
+			            AND lower(fb.brandname) like #{search}
+			        </when>
+			
+			        <when test="searchType == 'foodname'">
+			            AND f.foodname like #{search}
+			        </when>
+			
+			        <when test="searchType == 'pettypeid'">
+			            AND f.pettypeid = #{search}
+			        </when>
+				    <when test="searchType == 'title'">
+			            AND r.title like #{search}
+			        </when>		
+			        <when test="searchType == 'reviewcomment'">
+			            AND r.reviewcomment like #{search}
+			        </when>
+			        <otherwise>
+			          AND (
+			             lower(r.title) like #{search}
+			            OR lower(r.reviewcomment) like #{search}
+			          )
+			        </otherwise>
+			    </choose>
+			</where>
+	</select>	
+	
+
+	<!-- 사료-리뷰 연결용 서치 -->
+	<!-- 서치 -->
+		<select resultMap="ReviewMap" id="reviewsearchByFoodid" parameterType="int" >
+		
+		    select r.reviewid,
+		           fb.brandname,
+		           r.foodid,
+		           f.foodname,
+		           f.pettypeid,
+		           f.foodimg,
+		           r.rating,
+		           r.title,
+		           r.reviewcomment,
+		           u.nickname,
+		           u.userid,
+		           TO_CHAR(r.createdat, 'YYYY-MM-DD') as createdat,
+		           TO_CHAR(r.updatedat, 'YYYY-MM-DD') as updatedat
+		    from review r
+		         join food f on (r.foodid = f.foodid)
+		         join foodbrand fb on (r.brandid = fb.brandid)
+		         left join users u on (u.userid = r.userid)
+		    where r.foodid = #{foodid}
+		    order by r.reviewid desc
+		</select>
+	
+	
+		<select resultType="int" id="reviewsearchByFoodidCnt" parameterType="int">
+		    select count(*)
+		    from review r
+		         join food f on (r.foodid = f.foodid)
+		         join foodbrand fb on (r.brandid = fb.brandid)
+		         left join users u on (u.userid = r.userid)
+		    where r.foodid = #{foodid}
+		</select>
+	
+	
+	<!-- 내 글 구분 권한 확인용 -->
+	<!-- 유저 완성 후 통합시킬 것 -->
+    <!-- RoleDto 매핑 -->
+    <resultMap type="AuthDto" id="roleMap">
+        <result property="authId" column="AUTHID"/>
+        <result property="email"  column="EMAIL"/>
+        <result property="auth"   column="AUTH"/>
+    </resultMap>
+
+    <!-- UserAuthDto 매핑 -->
+    <resultMap type="UserAuthDto" id="userAuthMap">
+        <result property="email"    column="EMAIL"/>
+        <result property="password" column="PASSWORD"/>
+        <result property="userId"   column="USERID"/>
+        <collection property="authList" resultMap="roleMap"/>
+    </resultMap>
+    
+	<select id="readAuthForReview" resultMap="userAuthMap" parameterType="UserDto">
+	    SELECT u.email, r.auth
+	    FROM users u
+	    LEFT JOIN roles r ON u.email = r.email
+	    WHERE u.email = #{email}
+	</select>
+	
+	<select id="selectUserIdForReview" resultType="int" parameterType="String">
+	    SELECT USERID FROM USERS
+	    WHERE EMAIL = #{email}
+	</select>
+	
+	<delete id="reviewimgdeleteById" parameterType="int">
+	    DELETE FROM REVIEWIMG
+	    WHERE REVIEWID = #{value}
+	</delete>
+	
+	<delete id="reviewDeleteByAdmin" parameterType="int">
+	    delete from review
+	    where reviewid = #{value}
+	</delete>
+	
+</mapper>

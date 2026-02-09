@@ -1,0 +1,146 @@
+@charset "UTF-8";
+
+/*캡션 감추기*/
+caption.visually-hidden {
+  display: none;
+}
+
+
+	/* 그린 */
+	.btn-green {
+	  background-color: #2F7C57;
+	  color: #fff;
+	  border: none;
+	}
+	.btn-green:hover {
+	  background-color: #276B4C;
+	}
+	
+	/* 버건디 */
+	.btn-burgundy {
+	  background-color: #8B1E3F;
+	  color: #fff;
+	  border: none;
+	}
+	.btn-burgundy:hover {
+	  background-color: #751933;
+	}
+	
+	/* 머스터드 */
+	.btn-mustard {
+	  background-color: #C8A951;
+	  color: #fff;
+	  border: none;
+	}
+	.btn-mustard:hover {
+	  background-color: #b39345;
+	}
+	
+	/* 민트 */
+	.btn-mint {
+	  background-color: #4BA3C3;
+	  color: #fff;
+	  border: none;
+	}
+	.btn-mint:hover {
+	  background-color: #3b89a6;
+	}
+	
+	/* 로즈핑크 */
+	.btn-rose {
+	  background-color: #C7798B;
+	  color: #fff;
+	  border: none;
+	}
+	.btn-rose:hover {
+	  background-color: #B06776;
+	}
+	
+	/* 라벤더 */	
+	.btn-lavender {
+	  background-color: #A48EC6;
+	  color: #fff;
+	  border: none;
+	}
+	.btn-lavender:hover {
+	  background-color: #947EB4;
+	}
+	
+	/* 올리브 */	
+	.btn-olive {
+	  background-color: #6B775E;
+	  color: #fff;
+	  border: none;
+	}
+	.btn-olive:hover {
+	  background-color: #5D684F;
+	}
+	
+	/* 네이비 */	
+	.btn-navy {
+	  background-color: #24344D;
+	  color: #fff;
+	  border: none;
+	}
+	.btn-navy:hover {
+	  background-color: #1C2A40;
+	}
+	
+	/* 테라코타-오렌지, 브릭 */
+	.btn-terra {
+	  background-color: #C46A4A;
+	  color: #fff;
+	  border: none;
+	}
+	.btn-terra:hover {
+	  background-color: #B05C3F;
+	}	
+	
+	/* 로즈레드 */
+	.btn-roseRed {
+	  background-color: #A5333A;
+	  color: #fff;
+	  border: none;
+	}
+	.btn-roseRed:hover {
+	  background-color: #8F2C32;
+	}
+	
+	/* 세이지그린 */	
+	.btn-sage {
+	  background-color: #A8BFA3;
+	  color: #fff;
+	  border: none;
+	}
+	.btn-sage:hover {
+	  background-color: #94AB8F;
+	}	
+	
+	
+	/* 슬레이트 블루 */
+	.btn-slateBlue {
+	  background-color: #4C6FBF;
+	  color: #fff;
+	  border: none;
+	}
+	.btn-slateBlue:hover {
+	  background-color: #3D5CA3;
+	}
+		
+	
+	/* 모든 커스텀 버튼 hover 시 글자색 흰색 고정*/
+	/* 이거 없애면 글씨 까매져서 네이비는 마우스 올리는 순간 글자가 사라져요ㅎㅎ */
+	.btn-green:hover,
+	.btn-burgundy:hover,
+	.btn-mustard:hover,
+	.btn-mint:hover,
+	.btn-rose:hover,
+	.btn-lavender:hover,
+	.btn-olive:hover,
+	.btn-navy:hover,
+	.btn-terra:hover,
+	.btn-roseRed:hover,
+	.btn-sage:hover,
+	.btn-slateBlue:hover {
+	  color: #fff !important;
+	}

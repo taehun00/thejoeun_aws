@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket 알림 테스트</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2/dist/stomp.min.js"></script>
+</head>
+<body>
+    <h1>알림 테스트 페이지</h1>
+    <div id="messages"></div>
+
+    <script>
+        // 서버 WebSocket 엔드포인트 연결
+        const socket = new SockJS('/ws'); // WebSocketConfig에서 등록한 endpoint
+        const stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, () => {
+            // 공지사항 구독
+            stompClient.subscribe('/topic/notifications', (msg) => {
+                document.getElementById("messages").innerHTML += "<p>공지: " + msg.body + "</p>";
+            });
+
+            // 개인 알림 구독
+            stompClient.subscribe('/user/queue/notifications', (msg) => {
+                document.getElementById("messages").innerHTML += "<p>개인 알림: " + msg.body + "</p>";
+            });
+        });
+    </script>
+</body>
+</html>

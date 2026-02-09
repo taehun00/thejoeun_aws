@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pawject.dao.tester.TesterImgDao">
+	<resultMap type="com.pawject.dto.tester.TesterImgDto" id="TesterImgMap">
+	
+		<result property="testerimgid"	column="TESTERIMGID"/>
+		<result property="imgsrc"	column="IMGSRC"/>
+		<result property="testerid"	column="TESTERID"/>
+	
+	</resultMap>
+
+  <!-- 개별 이미지 파일 조회 -->
+  <select resultMap="TesterImgMap" id="testerImgSelectByImgid" parameterType="Long">
+    SELECT TESTERIMGID, TESTERID, IMGSRC
+    FROM TESTERIMG WHERE TESTERIMGID = #{testerimgid}
+  </select>
+
+	<!-- 이미지 insert -->
+	<insert id="insertTesterImg" parameterType="map">
+	  <selectKey keyProperty="testerimgid" resultType="long" order="BEFORE">
+	    SELECT TESTERIMG_SEQ.NEXTVAL FROM DUAL
+	  </selectKey>
+	
+	  INSERT INTO TESTERIMG(TESTERIMGID, TESTERID, IMGSRC)
+	  VALUES(#{testerimgid}, #{testerid}, #{imgsrc})
+	</insert>
+	
+	<!-- testerid로 이미지 리스트 -->
+	<select id="selectImgsByTesterid" parameterType="long" resultType="com.pawject.dto.tester.TesterImgDto">
+	  SELECT TESTERIMGID AS testerimgid,
+	         IMGSRC      AS imgsrc
+	  FROM TESTERIMG
+	  WHERE TESTERID = #{testerid}
+	  ORDER BY TESTERIMGID ASC
+	</select>
+	
+	<!-- 이미지 단건 삭제 -->
+	<delete id="deleteTesterImgById" parameterType="long">
+	  DELETE FROM TESTERIMG WHERE TESTERIMGID = #{testerimgid}
+	</delete>
+	
+	<!-- testerid로 이미지 전체 삭제 -->
+	<delete id="deleteImgsByTesterid" parameterType="long">
+	  DELETE FROM TESTERIMG WHERE TESTERID = #{testerid}
+	</delete>	
+	
+</mapper>

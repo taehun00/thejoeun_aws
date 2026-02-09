@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pawject.dao.support.CSAnswerDao"> 
+  <resultMap id="CSAnswerMap" type="com.pawject.dto.support.CSAnswerDto">
+    <result property="answerid" column="ANSWERID"/>
+    <result property="questionid" column="QUESTIONID"/>
+    <result property="adminid"    column="ADMINID"/>
+    <result property="answercontent"  column="ANSWERCONTENT"/>
+    <result property="createdat"      column="CREATEDAT"/>
+  </resultMap> 
+ 
+  <!-- 등록 -->
+  <insert id="insertCSA" parameterType="CSAnswerDto">
+	INSERT INTO CSANSWER(ANSWERID, QUESTIONID, ADMINID, ANSWERCONTENT )
+	        VALUES(CSANSWER_SEQ.NEXTVAL, #{questionid},#{adminid},#{answercontent})
+  </insert>
+  
+  <select resultMap="CSAnswerMap" id="selectByQuestionid" parameterType="int">
+    SELECT ANSWERID, QUESTIONID, ADMINID, ANSWERCONTENT, CREATEDAT
+    FROM CSANSWER WHERE QUESTIONID = #{questionid}
+  </select>
+
+</mapper>

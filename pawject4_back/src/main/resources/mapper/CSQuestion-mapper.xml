@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pawject.dao.support.CSQuestionDao"> 
+  <resultMap id="CSQuestionMap" type="com.pawject.dto.support.CSQuestionDto">
+    <result property="questionid" column="QUESTIONID"/>
+    <result property="userid" column="USERID"/>
+    <result property="category"    column="CATEGORY"/>
+    <result property="title"  column="TITLE"/>
+    <result property="content"  column="CONTENT"/>
+    <result property="status"  column="STATUS"/>
+    <result property="createdat"      column="CREATEDAT"/>
+    <result property="nickname"      column="NICKNAME"/>
+  </resultMap> 
+  
+  <!-- 전체 조회 -->
+  <select resultMap="CSQuestionMap" id="selectCSQAll">
+  	SELECT 
+    Q.QUESTIONID, Q.USERID, Q.CATEGORY, Q.TITLE, Q.CONTENT, Q.STATUS, Q.CREATEDAT, U.NICKNAME
+	FROM CSQUESTION Q LEFT JOIN USERS U ON(Q.USERID=U.USERID)
+  </select>
+  
+  
+  
+  <!-- 특정 질문 조회 -->	
+  <select resultMap="CSQuestionMap" id="selectCSQ" parameterType="int">
+    SELECT 
+    Q.QUESTIONID, Q.USERID, Q.CATEGORY, Q.TITLE, Q.CONTENT, Q.STATUS, Q.CREATEDAT, U.NICKNAME
+	FROM CSQUESTION Q LEFT JOIN USERS U ON(Q.USERID=U.USERID)
+	WHERE Q.QUESTIONID=#{questionid}
+  </select>
+  
+  <!-- 유저 작성글 조회 -->
+  <select resultMap="CSQuestionMap" id="selectCSQUser" parameterType="CSQuestionDto">
+  	SELECT * FROM CSQUESTION WHERE USERID=#{userid}
+  </select>  
+  
+ 
+  <!-- 등록 -->
+  <insert id="insertCSQ" parameterType="CSQuestionDto">
+	INSERT INTO CSQUESTION(QUESTIONID, USERID, CATEGORY, TITLE, CONTENT)
+        VALUES(CSQUESTION_SEQ.NEXTVAL, #{userid}, #{category}, #{title}, #{content})
+  </insert>
+  
+
+  
+  <!-- 답변 완료 전환-->
+  <update id="answerCSQ" parameterType="CSQuestionDto">
+    UPDATE CSQUESTION SET STATUS = CASE WHEN STATUS = 1 THEN 0	ELSE 1 END
+    WHERE QUESTIONID = #{questionid}
+  </update>
+  
+  <delete id="deleteCSQ" parameterType="int">
+  DELETE FROM CSQUESTION WHERE QUESTIONID=#{questionid}
+  </delete>
+
+
+
+
+
+
+	<!-- 페이징 (1) -->
+	<select id="select10CSQ" parameterType="java.util.HashMap" resultMap="CSQuestionMap">
+	    SELECT *
+	    FROM (
+	        SELECT 
+	            ROW_NUMBER() OVER (
+	                <choose>
+	                    <when test="condition == 'noanswer'">
+	                        ORDER BY Q.STATUS ASC, Q.QUESTIONID DESC
+	                    </when>
+	                    <when test="condition == 'answerend'">
+	                        ORDER BY Q.STATUS DESC, Q.QUESTIONID DESC
+	                    </when>
+	                    <otherwise>
+	                        ORDER BY Q.QUESTIONID DESC
+	                    </otherwise>
+	                </choose>
+	            ) AS rnum,
+	            Q.QUESTIONID, Q.USERID, Q.CATEGORY, Q.TITLE, Q.CONTENT,
+	            Q.STATUS, Q.CREATEDAT, U.NICKNAME
+	        FROM CSQUESTION Q
+	        LEFT JOIN USERS U ON Q.USERID = U.USERID
+	    )
+	    WHERE rnum BETWEEN #{start} AND #{end}
+	</select>
+
+	<!-- 페이징 (2) -->
+	<select  id="selectTotalCntCSQ"  resultType="int">
+		select count(*)  from CSQUESTION 
+	</select>
+	
+	<!-- 페이징+검색어(3) -->
+	<select  id="selectSearchCSQ"  parameterType="java.util.HashMap"  resultMap="CSQuestionMap">
+		select * from(
+			select row_number() over(
+	                <choose>
+	                    <when test="condition == 'noanswer'">
+	                        ORDER BY Q.STATUS ASC, Q.QUESTIONID DESC
+	                    </when>
+	                    <when test="condition == 'answerend'">
+	                        ORDER BY Q.STATUS DESC, Q.QUESTIONID DESC
+	                    </when>
+	                    <otherwise>
+	                        ORDER BY Q.QUESTIONID DESC
+	                    </otherwise>
+	                </choose>			)  as rnum, 
+		    Q.QUESTIONID, Q.USERID, Q.CATEGORY, Q.TITLE, Q.CONTENT, Q.STATUS, Q.CREATEDAT, U.NICKNAME
+			FROM CSQUESTION Q LEFT JOIN USERS U ON(Q.USERID=U.USERID)
+	    <where>
+			<choose>
+			    <when test="searchType == 'title'">
+			        lower(q.title) like #{search}
+			    </when>
+			    <when test="searchType == 'content'">
+			        lower(q.content) like #{search}
+			    </when>
+			    <when test="searchType == 'nickname'">
+			        lower(u.nickname) like #{search}
+			    </when>
+			    <otherwise>
+			       lower(q.title) like #{search} or lower(q.content) like #{search}
+			    </otherwise>
+			</choose>
+	    </where>
+		) A  
+		where  A.rnum  between  #{start}  and #{end}	
+
+	
+
+	</select> 
+	
+	<!-- 페이징+검색어(4) 검색어 기준 전체 건수 -->
+		<select id="selectSearchTotalCntCSQ"
+		        parameterType="java.util.HashMap"
+		        resultType="int">
+		
+		    SELECT COUNT(*)
+		    FROM CSQUESTION Q
+		    LEFT JOIN USERS U ON (Q.USERID = U.USERID)
+		    <where>
+		        <choose>
+		            <when test="searchType == 'title'">
+		                lower(Q.TITLE) like #{search}
+		            </when>
+		            <when test="searchType == 'content'">
+		                lower(Q.CONTENT) like #{search}
+		            </when>
+		            <when test="searchType == 'nickname'">
+		                lower(U.NICKNAME) like #{search}
+		            </when>
+			    <otherwise>
+			       lower(q.title) like #{search} or lower(q.content) like #{search}
+			    </otherwise>
+		        </choose>
+		    </where>
+		</select>
+
+
+
+
+
+
+
+ <!-- 특정 유저(서치 추가 시)SELECT * FROM CSQUESTION WHERE USERID=1;-->
+ <!-- 미답변 확인(서치 추가 시) SELECT * FROM CSQUESTION WHERE STATUS=0;-->
+  
+
+
+
+</mapper>

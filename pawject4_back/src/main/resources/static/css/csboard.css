@@ -1,0 +1,134 @@
+/* 전체 컨테이너 */
+.csq-container {
+    width: 80%;
+    margin: 40px auto;
+}
+
+/* 제목 */
+.csq-title {
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 600;
+}
+
+.csqad-title {
+    text-align: left;
+    margin-bottom: 25px;
+    font-weight: 600;
+}
+
+.csqad-table thead th,
+.csqad-table tbody td,
+.csq-table thead th,
+.csq-table tbody td {
+    vertical-align: middle;
+}
+
+/*컬럼 간격 조정 - 유저용*/
+.csq-table th:nth-child(1),
+.csq-table td:nth-child(1) {
+    width: 60px;   
+}	
+.csq-table th:nth-child(2),
+.csq-table td:nth-child(2) {
+    width: 100px;   
+}
+
+.csq-table th:nth-child(3),
+.csq-table td:nth-child(3) {
+    width: auto;   
+}
+.csq-table th:nth-child(4),
+.csq-table td:nth-child(4){
+    width: 200px;   
+}
+.csq-table th:nth-child(5),
+.csq-table td:nth-child(5){
+    width: 120px;   
+}
+
+/*컬럼 간격 조정 - 관리자용*/
+.csqad-table .col-no { width: 60px; }
+.csqad-table .col-category { width: 100px; }
+.csqad-table .col-title { width: auto; }
+.csqad-table .col-nickname { width: 100px; }
+.csqad-table .col-created { width: 130px; }
+.csqad-table .col-status { width: 120px; }
+.csqad-table .col-action { width: 120px; }
+
+/* 상세 행 숨김 */
+.csq-detail {
+    display: none;
+}
+
+/* 상세 내부 테이블 */
+.detail-inner-table {
+    width: 100%;
+}
+
+/* 상세 내용 */
+/* 답변 - 일반 텍스트, 왼쪽 정렬 */
+.detail .csq-answer {
+    margin: 0 0 12px 0;
+    padding: 5px 0 0 20px;
+    text-align: left;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* 넓이 조정 */
+.csq-answer	 {
+    max-width: 850px; 
+    overflow-wrap: break-word;
+}
+
+/* 키워드 - 하단 우측 정렬 */
+.detail .csq-keyword-wrap {
+    text-align: right;
+    padding : 0 5px 5px 0;
+}
+
+
+/* 작성 버튼 */
+.write-btn-area {
+    text-align: right;
+    margin-top: 20px;
+}
+
+/* 답변 작성 - 기존 질문 테이블*/
+.foranswer-table{
+	width:1200px;
+	margin:30px;
+	padding:30px;
+}
+
+.foranswer-table thead th,
+.foranswer-table tbody td{
+    vertical-align: middle;
+}
+
+.foranswer-table th:nth-child(1),
+.foranswer-table td:nth-child(1){
+    width: 120px;   
+}
+.foranswer-table th:nth-child(2),
+.foranswer-table td:nth-child(2){
+    width: auto;   
+}
+.foranswer-table th:nth-child(3),
+.foranswer-table td:nth-child(3){
+    width: 200px;   
+}
+
+.questioncontent td{
+	margin:10px;
+	padding:20px;
+	text-align:left;
+}
+
+.answercontent textarea {
+  width: 1200px;
+  display: block;      
+  margin: 0 auto;      
+}
+

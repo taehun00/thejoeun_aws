@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pawject.dao.exec.ExecSnsDao">
+ <resultMap id="execsnsMap" type="ExecSnsDto">
+ 	<result property="postid"   column="POSTID"/>
+ 	<result property="etitle"   column="ETITLE"/>
+ 	<result property="econtent" column="ECONTENT"/>
+ 	<result property="eimg"     column="EIMG"/>
+ 	<result property="ehit"     column="EHIT"/>
+ 	<result property="createdAt" column="CREATEDAT"/>
+ 	<result property="updatedAt" column="UPDATEDAT"/>
+ </resultMap>
+ 
+ 
+ <insert id="insertsns" parameterType="ExecSnsDto">
+ 	insert into execsns  (POSTID, ETITLE  ,  ECONTENT,    EIMG    )
+    values ( execsns_seq.nextval, #{etitle}, #{econtent}, #{eimg, jdbcType=VARCHAR} )
+ </insert>
+ 
+ <update id="updatesns" parameterType="ExecSnsDto">
+  update execsns 
+  <set> 
+	  ETITLE=#{etitle},  
+	  ECONTENT=#{econtent},
+	  EIMG=#{eimg, jdbcType=VARCHAR}
+  </set>
+   where POSTID=#{postid} 	
+ </update>
+ 
+ <update id="updateHitsns" parameterType="int">
+	update  execsns   
+	<set>EHIT = EHIT + 1</set>
+	 where  POSTID=#{postid} 
+</update>
+
+ <delete id="deletesns" parameterType="int">
+ 	delete from execsns where POSTID=#{postid}
+ </delete>
+ 
+ <select resultMap="execsnsMap"  id="selectAllsns" >
+	select * from execsns order by POSTID desc
+ </select>
+ 
+ <select resultMap="execsnsMap" id="selectsns" parameterType="int">
+	select * from execsns where POSTID=#{postid}
+ </select>
+ 
+ <select id="selectPosts" parameterType="string" resultType="int">
+    SELECT postid
+    FROM execsns
+    WHERE etitle LIKE '%' || #{keyword} || '%'
+ </select>
+ 
+
+
+ 
+ 
+  <!-- 페이징(1) - select10 -->
+  <select id="selectsns10" parameterType="java.util.HashMap" resultMap="execsnsMap">
+	  select *
+		from (
+		    select row_number() over (order by POSTID desc) as rnum,
+		           POSTID,  ETITLE, ECONTENT, EIMG, EHIT,
+		           CREATEDAT, UPDATEDAT
+		    from execsns
+		) A
+		where A.rnum between #{start} and #{end}
+  </select>
+ <!-- 페이징(2) - selectsnsTotalCnt -->
+  <select id="selectsnsTotalCnt" resultType="int">
+  	select count(*) from execsns
+  </select>
+ 
+  <!-- 페이징(3) - selectsns3 -->
+  <select id="selectsns3" parameterType="java.util.HashMap" resultMap="execsnsMap">
+  	select *
+		from (
+		    select row_number() over (order by POSTID desc) as rnum,
+		           POSTID, ETITLE, ECONTENT, EIMG, EHIT,
+		           CREATEDAT, UPDATEDAT
+		    from execsns
+			where ETITLE  LIKE '%' || #{search , jdbcType=VARCHAR} || '%'
+		) A
+	where A.rnum between #{start} and #{end}
+  </select>
+
+  <!-- 페이징(4) - selectsnsSearchTotalCnt -->
+  <select id="selectsnsSearchTotalCnt" parameterType="string" resultType="int">
+  	select count (*) 
+	from execsns
+	where ETITLE LIKE '%' || #{search, jdbcType=VARCHAR} || '%'
+  </select>
+</mapper>
+
+
+
+
+

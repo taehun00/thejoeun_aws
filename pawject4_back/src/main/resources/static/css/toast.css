@@ -1,0 +1,30 @@
+/* toast.css */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #ffeef8;
+  color: #333;
+  padding: 14px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: none;
+  font-size: 15px;
+  animation: slideUp 0.5s ease-out;
+}
+.toast .icon {
+  margin-right: 8px;
+}
+#toast-close {
+  cursor: pointer;
+  font-weight: bold;
+  color: #999;
+  float: right;
+}
+#toast-close:hover {
+  color: #333;
+}
+@keyframes slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

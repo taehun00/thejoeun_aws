@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pawject.dao.food.SearchPetfoodDao">
+	<resultMap type="com.pawject.dto.food.SearchPetfoodDto" id="SearchPetfoodMap">
+	
+		
+	<!-- 펫타입-->	
+	<result property="pettypeid"	column="PETTYPEID"/>
+	<result property="pettypename"	column="PETTYPENAME"/>
+	
+	<!-- 브랜드 -->	
+	<result property="brandid"	column="BRANDID"/>
+	<result property="brandname"	column="BRANDNAME"/>
+	<result property="country"	column="COUNTRY"/>
+	<result property="brandtype"	column="BRANDTYPE"/>
+	<result property="origin"	column="ORIGIN"/>
+	<result property="brandinfo"	column="BRANDINFO"/>
+
+	<!-- 사료 -->	
+	<result property="foodid"	column="FOODID"/>
+	<result property="foodname"	column="FOODNAME"/>
+	<result property="description"	column="DESCRIPTION"/>
+	<result property="mainingredient"	column="MAININGREDIENT"/>
+	<result property="subingredient"	column="SUBINGREDIENT"/>
+	<result property="category"	column="CATEGORY"/>
+	<result property="petagegroup"	column="PETAGEGROUP"/>
+	<result property="isgrainfree"	column="ISGRAINFREE"/>
+	<result property="calorie"	column="CALORIE"/>
+	<result property="foodtype"	column="FOODTYPE"/>
+	<result property="foodimg"	column="FOODIMG"/>
+
+	<!-- 영양 -->	
+	<result property="nutrientid"	column="NUTRIENTID"/>
+	<result property="amount"	column="AMOUNT"/>
+	<result property="nutrientname"	column="NUTRIENTNAME"/>
+	<result property="unit"	column="UNIT"/>
+	<result property="rangeid"	column="RANGEID"/>
+	<result property="minvalue"	column="MINVALUE"/>
+	<result property="maxvalue"	column="MAXVALUE"/>
+	<result property="rangelabel"	column="RANGELABEL"/>
+	
+	<result property="nutriinfo"	column="NUTRIINFO"/>
+	
+	<!-- 별점 -->	
+	<result property="avgrating"	column="AVGRATING"/>	
+
+	</resultMap>
+
+
+	<!-- 카드형 이미지(출력 테스트용) -->
+	<select resultMap="SearchPetfoodMap" id="resultcard">
+		SELECT B.BRANDNAME, F.FOODNAME , F.FOODIMG, R.AVGRATING, F.DESCRIPTION
+		FROM FOOD F 
+	    JOIN FOODBRAND B ON(F.BRANDID=B.BRANDID)
+	    LEFT JOIN (SELECT FOODID, ROUND(AVG(RATING), 2) AS AVGRATING FROM REVIEW GROUP BY FOODID) R ON (F.FOODID=R.FOODID)
+		order by foodname
+	</select>
+	
+	<!-- 상세 정보(모달팝업) -->
+	<select resultMap="SearchPetfoodMap" id="detailCard" parameterType="int">
+		SELECT  F.PETTYPEID,
+		        F.FOODID, F.FOODNAME, F.BRANDID, F.DESCRIPTION,
+		        B.BRANDNAME, B.COUNTRY, B.BRANDTYPE, B.BRANDINFO,
+		        F.CATEGORY, F.PETAGEGROUP, F.ISGRAINFREE, F.CALORIE, F.FOODTYPE,
+		        F.MAININGREDIENT, F.SUBINGREDIENT,
+		        NINFO.NUTRIINFO
+		        
+		FROM FOOD F
+		JOIN FOODBRAND B ON F.BRANDID = B.BRANDID
+		
+		LEFT JOIN ( 
+		        SELECT FN.FOODID,
+		        LISTAGG(
+		            N.NUTRIENTNAME || ':' || FN.AMOUNT || N.UNIT, ', '
+		            ) WITHIN GROUP (ORDER BY N.NUTRIENTID) AS NUTRIINFO
+		        FROM FOODNUTRIENT FN
+		        JOIN NUTRIENT N ON (FN.NUTRIENTID = N.NUTRIENTID)
+		        GROUP BY FN.FOODID) NINFO ON(F.FOODID = NINFO.FOODID)
+		WHERE F.FOODID=#{foodid}        
+	</select>	
+	
+	<!-- 서치 필터 -->
+	<select resultMap="SearchPetfoodMap" id="foodfilter" parameterType="java.util.HashMap">
+		SELECT
+		  B.BRANDNAME, F.FOODNAME, F.FOODIMG, R.AVGRATING, F.DESCRIPTION, F.FOODID
+		FROM FOOD F
+		JOIN FOODBRAND B ON F.BRANDID = B.BRANDID
+		LEFT JOIN ( SELECT FOODID, ROUND(AVG(RATING), 2) AS AVGRATING
+		  			FROM REVIEW GROUP BY FOODID
+				  ) R ON F.FOODID = R.FOODID
+		<where>
+		  <if test="pettypeid != null">
+		    AND F.PETTYPEID = #{pettypeid}
+		  </if>
+		  <if test="brandid != null">
+		    AND B.BRANDID = #{brandid}
+		  </if>
+		  <if test="foodid != null">
+		    AND F.FOODID = #{foodid}
+		  </if>
+		  <if test="petagegroup != null">
+		    AND F.PETAGEGROUP = #{petagegroup}
+		  </if>
+		  <if test="category != null">
+		    AND F.CATEGORY = #{category}
+		  </if>
+		  <if test="foodtype != null">
+		    AND F.FOODTYPE = #{foodtype}
+		  </if>
+		  <if test="isgrainfree != null">
+		    AND F.ISGRAINFREE = #{isgrainfree}
+		  </if>
+		  <if test="origin != null">
+		    AND B.ORIGIN = #{origin}
+		  </if>
+		
+		  <!-- 영양 조건은 EXISTS로만 **-->
+		  <if test="rangeid != null">
+		    AND EXISTS (
+		      SELECT 1
+		      FROM FOODNUTRIENT FN
+		      JOIN NUTRIENTRANGE RN ON FN.NUTRIENTID = RN.NUTRIENTID
+		      WHERE FN.FOODID = F.FOODID
+		        AND RN.RANGEID = #{rangeid}
+		        AND FN.AMOUNT BETWEEN RN.MINVALUE AND RN.MAXVALUE
+		    )
+		  </if>
+		
+		  <if test="minvalue != null">
+		    AND F.CALORIE &gt;= #{minvalue}
+		  </if>
+		  <if test="maxvalue != null">
+		    AND F.CALORIE &lt;= #{maxvalue}
+		  </if>
+		
+		  <if test="keyword != null and keyword != ''">
+		    AND (
+		      F.FOODNAME        LIKE '%' || #{keyword} || '%'
+		      OR F.MAININGREDIENT LIKE '%' || #{keyword} || '%'
+		      OR F.SUBINGREDIENT  LIKE '%' || #{keyword} || '%'
+		    )
+		  </if>
+		</where>
+		ORDER BY F.FOODNAME 
+	</select>	
+	
+	
+
+	<resultMap type="SearchPetfoodDto" id="RangeMap">
+		<result property="pettypeid"	column="PETTYPEID"/>
+		<result property="rangeid"	column="RANGEID"/>
+		<result property="rangelabel"	column="RANGELABEL"/>
+	</resultMap>
+
+	<!-- 영양 범위 라벨 필터 -->
+	<select resultMap="RangeMap" id="rangeList">
+		SELECT RANGEID, PETTYPEID, RANGELABEL FROM NUTRIENTRANGE
+	</select>
+	
+	
+	
+	<!-- 페이징 -->
+	<select resultMap="SearchPetfoodMap" id="foodfilter10" parameterType="java.util.HashMap">
+        SELECT * FROM(SELECT ROW_NUMBER() OVER(
+				<choose>
+				  <when test="condition == 'foodnameAsc'">
+				    ORDER BY F.FOODNAME, F.FOODID
+				  </when>
+				  <when test="condition == 'foodnameDesc'">
+				    ORDER BY F.FOODNAME DESC, F.FOODID DESC
+				  </when>
+				  <when test="condition == 'brandnameAsc'">
+				    ORDER BY B.BRANDNAME, F.FOODNAME, F.FOODID
+				  </when>
+				  <when test="condition == 'brandnameDesc'">
+				    ORDER BY B.BRANDNAME DESC, F.FOODNAME, F.FOODID
+				  </when>
+				  <!-- NULL값일 경우 고려해야됨 -->
+				  <when test="condition == 'avgratingAsc'">
+				    ORDER BY NVL(R.AVGRATING, 0), F.FOODNAME, F.FOODID
+				  </when>
+				  <when test="condition == 'avgratingDesc'">
+				    ORDER BY NVL(R.AVGRATING, 0) DESC, F.FOODNAME, F.FOODID
+				  </when>
+				  <otherwise>
+				    ORDER BY F.FOODNAME, F.FOODID
+				  </otherwise>
+				</choose>
+        
+        ) AS RNUM,
+                    B.BRANDNAME, F.FOODNAME , F.FOODIMG, R.AVGRATING, F.DESCRIPTION,  F.FOODID
+                    FROM FOOD F 
+                    JOIN FOODBRAND B ON(F.BRANDID=B.BRANDID)
+                    LEFT JOIN (SELECT FOODID, ROUND(AVG(RATING), 2) AS AVGRATING FROM REVIEW GROUP BY FOODID) R ON (F.FOODID=R.FOODID)
+                   <where>
+                      <if test="pettypeid != null">
+                        AND F.PETTYPEID = #{pettypeid}
+                      </if>
+                      <if test="brandid != null">
+                        AND B.BRANDID = #{brandid}
+                      </if>
+                      <if test="foodid != null">
+                        AND F.FOODID = #{foodid}
+                      </if>
+                      <if test="petagegroup != null">
+                        AND F.PETAGEGROUP = #{petagegroup}
+                      </if>
+                      <if test="category != null">
+                        AND F.CATEGORY = #{category}
+                      </if>
+                      <if test="foodtype != null">
+                        AND F.FOODTYPE = #{foodtype}
+                      </if>
+                      <if test="isgrainfree != null">
+                        AND F.ISGRAINFREE = #{isgrainfree}
+                      </if>
+                      <if test="origin != null">
+                        AND B.ORIGIN = #{origin}
+                      </if>
+                    
+                      <!-- 영양 조건은 EXISTS로만 **-->
+                    <if test="rangeid != null and rangeid != ''">
+                        AND EXISTS (
+                          SELECT 1
+                          FROM FOODNUTRIENT FN
+                          JOIN NUTRIENTRANGE RN ON FN.NUTRIENTID = RN.NUTRIENTID
+                          WHERE FN.FOODID = F.FOODID
+                            AND RN.RANGEID = #{rangeid}
+                            AND FN.AMOUNT BETWEEN RN.MINVALUE AND RN.MAXVALUE
+                        )
+                      </if>
+            
+                    
+                      <if test="minvalue != null">
+                        AND F.CALORIE &gt;= #{minvalue}
+                      </if>
+                      <if test="maxvalue != null">
+                        AND F.CALORIE &lt;= #{maxvalue}
+                      </if>
+                    
+                      <if test="keyword != null and keyword != ''">
+                        AND (
+                          F.FOODNAME        LIKE '%' || #{keyword} || '%'
+                          OR F.MAININGREDIENT LIKE '%' || #{keyword} || '%'
+                          OR F.SUBINGREDIENT  LIKE '%' || #{keyword} || '%'
+                        )
+                      </if>
+                    </where>
+                    ) A
+                    WHERE A.RNUM BETWEEN #{start} AND #{end}
+	
+	</select>
+	
+	
+	<select resultType="int" id="foodfilterCnt" parameterType="java.util.HashMap">
+		
+		SELECT COUNT(*)
+		FROM FOOD F
+		JOIN FOODBRAND B ON F.BRANDID = B.BRANDID
+		LEFT JOIN ( SELECT FOODID, ROUND(AVG(RATING), 2) AS AVGRATING
+		  			FROM REVIEW GROUP BY FOODID
+				  ) R ON F.FOODID = R.FOODID
+		<where>
+		  <if test="pettypeid != null">
+		    AND F.PETTYPEID = #{pettypeid}
+		  </if>
+		  <if test="brandid != null">
+		    AND B.BRANDID = #{brandid}
+		  </if>
+		  <if test="foodid != null">
+		    AND F.FOODID = #{foodid}
+		  </if>
+		  <if test="petagegroup != null">
+		    AND F.PETAGEGROUP = #{petagegroup}
+		  </if>
+		  
+		  <if test="category != null">
+		    AND F.CATEGORY = #{category}
+		  </if>
+		  <if test="foodtype != null">
+		    AND F.FOODTYPE = #{foodtype}
+		  </if>
+		  <if test="isgrainfree != null">
+		    AND F.ISGRAINFREE = #{isgrainfree}
+		  </if>
+		  <if test="origin != null">
+		    AND B.ORIGIN = #{origin}
+		  </if>
+		
+		  <!-- 영양 조건은 EXISTS로만 **-->
+		 <if test="rangeid != null and rangeid != ''">
+		    AND EXISTS (
+		      SELECT 1
+		      FROM FOODNUTRIENT FN
+		      JOIN NUTRIENTRANGE RN ON FN.NUTRIENTID = RN.NUTRIENTID
+		      WHERE FN.FOODID = F.FOODID
+		        AND RN.RANGEID = #{rangeid}
+		        AND FN.AMOUNT BETWEEN RN.MINVALUE AND RN.MAXVALUE
+		    )
+		  </if>
+
+		  <if test="minvalue != null">
+		    AND F.CALORIE &gt;= #{minvalue}
+		  </if>
+		  <if test="maxvalue != null">
+		    AND F.CALORIE &lt;= #{maxvalue}
+		  </if>
+		
+		  <if test="keyword != null and keyword != ''">
+		    AND (
+		      F.FOODNAME        LIKE '%' || #{keyword} || '%'
+		      OR F.MAININGREDIENT LIKE '%' || #{keyword} || '%'
+		      OR F.SUBINGREDIENT  LIKE '%' || #{keyword} || '%'
+		    )
+		  </if>
+		</where>
+	</select>
+	
+	
+	<!-- ai 값 전달용 -->
+	<select resultMap="SearchPetfoodMap" id="aiRecommend" >
+		SELECT
+		    (SELECT LISTAGG(PETTYPENAME, ', ') WITHIN GROUP (ORDER BY PETTYPENAME)
+		     FROM (SELECT DISTINCT P.PETTYPENAME
+		           FROM FOOD F JOIN PETTYPE P ON (P.PETTYPEID = F.PETTYPEID) )
+		    ) AS PETTYPENAME,
+		
+		    (SELECT LISTAGG(BRANDNAME, ', ')
+		        WITHIN GROUP (ORDER BY BRANDNAME)
+		     FROM (SELECT DISTINCT BRANDNAME FROM FOODBRAND)
+		    ) AS BRANDNAME,
+		
+		    (SELECT LISTAGG(COUNTRY, ', ')
+		        WITHIN GROUP (ORDER BY COUNTRY)
+		     FROM (SELECT DISTINCT COUNTRY FROM FOODBRAND)
+		    ) AS COUNTRY,
+		
+		    (SELECT LISTAGG(BRANDTYPE, ', ')
+		        WITHIN GROUP (ORDER BY BRANDTYPE)
+		     FROM (SELECT DISTINCT BRANDTYPE FROM FOODBRAND)
+		    ) AS BRANDTYPE,
+		
+		    (SELECT LISTAGG(ORIGIN, ', ')
+		        WITHIN GROUP (ORDER BY ORIGIN)
+		     FROM (SELECT DISTINCT ORIGIN FROM FOODBRAND)
+		    ) AS ORIGIN,
+		
+		    (SELECT LISTAGG(CATEGORY, ', ') WITHIN GROUP (ORDER BY CATEGORY)
+		     FROM (SELECT DISTINCT CATEGORY FROM FOOD)
+		    ) AS CATEGORY,
+		
+		    (SELECT LISTAGG(PETAGEGROUP, ', ') WITHIN GROUP (ORDER BY PETAGEGROUP)
+		     FROM (SELECT DISTINCT PETAGEGROUP FROM FOOD)
+		    ) AS PETAGEGROUP,    
+		
+		    (SELECT LISTAGG(ISGRAINFREE, ', ')
+		        WITHIN GROUP (ORDER BY ISGRAINFREE)
+		     FROM (SELECT DISTINCT ISGRAINFREE FROM FOOD)
+		    ) AS ISGRAINFREE,
+		    
+		    (SELECT LISTAGG(FOODTYPE, ', ')
+		        WITHIN GROUP (ORDER BY FOODTYPE)
+		     FROM (SELECT DISTINCT FOODTYPE FROM FOOD)
+		    ) AS FOODTYPE,
+		    
+		    (SELECT LISTAGG(RANGELABEL, ', ')
+		        WITHIN GROUP (ORDER BY RANGELABEL)
+		     FROM (SELECT DISTINCT RANGELABEL FROM NUTRIENTRANGE)
+		    ) AS RANGELABEL
+		FROM DUAL
+	</select>
+	
+	
+	
+	
+	
+	
+</mapper>

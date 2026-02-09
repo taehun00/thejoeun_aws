@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pawject.dao.support.FAQDao"> 
+  <resultMap id="FAQMap" type="com.pawject.dto.support.FAQDto">
+    <result property="faqid" column="FAQID"/>
+    <result property="category" column="CATEGORY"/>
+    <result property="question"    column="QUESTION"/>
+    <result property="answer"  column="ANSWER"/>
+    <result property="keywords"     column="KEYWORDS"/>
+    <result property="isactive"     column="ISACTIVE"/>
+    <result property="createdat"      column="CREATEDAT"/>
+    <result property="updatedat" column="UPDATEDAT"/>
+  </resultMap> 
+  
+  <!-- 전체 조회 -->
+  <select resultMap="FAQMap" id="selectFAQAll">
+  	SELECT * FROM FAQ ORDER BY FAQID
+  </select>
+
+  <select resultMap="FAQMap" id="selectFAQActive">
+  	SELECT * FROM FAQ WHERE ISACTIVE = 1 ORDER BY FAQID 
+  </select>
+    
+  <!-- 특정 답변 조회 -->	
+  <select resultMap="FAQMap" id="selectFAQ" parameterType="Long">
+	SELECT * FROM FAQ WHERE FAQID=#{faqid}
+  </select>
+ 
+  <!-- 등록 -->
+  <insert id="insertFAQ" parameterType="FAQDto">
+ 	 INSERT INTO FAQ(FAQID, CATEGORY, QUESTION, ANSWER, KEYWORDS)
+			VALUES (FAQ_SEQ.NEXTVAL, #{category}, #{question}, #{answer}, #{keywords})
+  </insert>
+  
+    <!-- 수정 -->
+  <update id="updateFAQ" parameterType="FAQDto">
+  	UPDATE FAQ SET category=#{category}, question=#{question}, 
+  	answer=#{answer}, keywords=#{keywords},  UPDATEDAT=SYSDATE
+  	WHERE FAQID=#{faqid}
+  </update>
+  
+  <!-- 활성화 전환 (매퍼에서 바로 전환)-->
+  <update id="activeFAQ" parameterType="FAQDto">
+    UPDATE FAQ SET ISACTIVE = CASE WHEN ISACTIVE = 1 THEN 0	ELSE 1 END
+    WHERE faqid = #{faqid}
+
+  </update>
+
+ <!-- 활성화/비활성화(서치 추가 시) SELECT * FROM FAQ WHERE ISACTIVE=1 ORDER BY FAQID;-->
+ <!-- 카테고리별 활성화/비활성화(서치 추가 시) SELECT * FROM FAQ WHERE ISACTIVE=1 AND CATEGORY='계정' ORDER BY FAQID;-->
+  
+
+
+
+</mapper>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pawject.dao.review.ReviewImgDao">
+	<resultMap type="com.pawject.dto.review.ReviewImgDto" id="ReviewImgMap">
+		<result property="reviewimgid"	column="REVIEWIMGID"/>
+		<result property="reviewid"	column="REVIEWID"/>
+		<result property="reviewimgname"	column="REVIEWIMGNAME"/>
+			<result property="createdat"	column="CREATEDAT"/>
+	</resultMap>
+	
+	<!-- 전체 이미지파일 -->
+	<select resultMap="ReviewImgMap"  id="reviewimgselectAll" >
+	select * from reviewimg order by reviewimgid desc
+	</select>
+	
+	<!-- 특정 리뷰의 이미지 묶음 -->
+	<select resultMap="ReviewImgMap" id="reviewimgSelect" parameterType="int">
+	select * from reviewimg	where reviewid=#{reviewid} order by reviewimgid desc
+	</select>
+	
+	<!-- 개별 이미지파일 -->
+	<select resultMap="ReviewImgMap" id="reviewimgIdSelect" parameterType="int">
+	select * from reviewimg	where reviewimgid=#{reviewimgid} 
+	</select>
+	
+	<insert id="reviewimginsert" parameterType="ReviewImgDto">
+	insert into reviewimg(reviewimgid, reviewid, reviewimgname) values(reviewimg_seq.nextval, #{reviewid}, #{reviewimgname})
+	</insert>
+	
+	<update id="reviewimgupdate" parameterType="ReviewImgDto">
+	update reviewimg set reviewimgname=#{reviewimgname} where reviewimgid=#{reviewimgid} and reviewid=#{reviewid}
+	</update>
+	
+	<delete id="reviewimgdeleteAll" parameterType="int">
+	delete from reviewimg where reviewid=#{reviewid}
+	</delete>
+	
+	<delete id="reviewimgdelete" parameterType="int">
+	delete from reviewimg where reviewimgid=#{reviewimgid}
+	</delete>
+
+	
+	
+</mapper>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration> 
+    <!-- 전역 설정 -->
+    <settings> 
+    		<!-- DB 컬럼명 → camelCase 자동 매핑 -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/> 
+    		<!-- 캐시사용여부 -->
+        <setting name="cacheEnabled" value="false"/> 
+    		<!-- fetch size -->
+        <setting name="defaultFetchSize" value="100"/> 
+    		<!-- timeout -->
+        <setting name="defaultStatementTimeout" value="30"/>
+    </settings>
+    
+ 	<typeAliases>
+ 	    <package name="com.pawject.dto.food"/>
+ 	    <package name="com.pawject.dto.petdisease"/>
+ 	    <package name="com.pawject.dto.review"/>
+ 	    <package name="com.pawject.dto.support"/>
+ 	    <package name="com.pawject.dto.tester"/>
+ 	    <package name="com.pawject.dto.user"/>
+ 	    <package name="com.pawject.dto.exec"/>
+ 	</typeAliases>
+</configuration>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+	<mapper namespace="com.pawject.dao.petdisease.PetdiseaseDao">
+	
+	<resultMap type="com.pawject.dto.petdisease.PetdiseaseResponseDto" id="PetdisResMap">
+		<result property="disno"	column="DISNO"/>
+		<result property="pettypeid"	column="PETTYPEID"/>
+		<result property="disname"	column="DISNAME"/>
+		<result property="definition"	column="DEFINITION"/>
+		<result property="cause"	column="CAUSE"/>
+		<result property="symptom"	column="SYMPTOM"/>
+		<result property="treatment"	column="TREATMENT"/>
+		<result property="tip"	column="TIP"/>
+		<result property="createdat"	column="CREATEDAT"/>
+		<result property="updatedat"	column="UPDATEDAT"/>
+	</resultMap>
+	
+	<!-- 글쓰기, 수정, 삭제는 JWT 이용-->
+
+	<!-- 페이징+정렬(1) -->
+	<select resultMap="PetdisResMap"  id="select10Petdis" parameterType="java.util.HashMap">
+	SELECT * FROM(SELECT ROW_NUMBER()OVER(
+					<choose>
+					  <when test="condition == 'disnameAsc'">
+					    ORDER BY D.DISNAME ASC
+					  </when>
+					  <when test="condition == 'disnameDesc'">
+					    ORDER BY D.DISNAME DESC
+					  </when>
+					  <when test="condition == 'old'">
+					    ORDER BY D.DISNO ASC
+					  </when>
+					  <when test="condition == 'new'">
+					    ORDER BY D.DISNO DESC
+					  </when>
+					  <otherwise>
+					    ORDER BY D.DISNO DESC
+					  </otherwise>
+					</choose> 
+	            ) AS RNUM,
+	            D.DISNO,  D.PETTYPEID, 
+	                    D.DISNAME, D.DEFINITION, D.CAUSE, 
+	                    D.SYMPTOM, D.TREATMENT, D.TIP, 
+	                    D.CREATEDAT, D.UPDATEDAT
+				FROM PETDISEASE D
+				JOIN PETTYPE P ON D.PETTYPEID=P.PETTYPEID
+	)A 
+	WHERE A.RNUM BETWEEN #{start} AND #{end}
+	
+	</select>	
+
+<!-- 페이징+정렬 카운트(1-2) -->
+	<select id="countByPetdisPaging" resultType="int" >
+		select count(*) from PETDISEASE
+	</select>
+	
+	
+	<!-- 페이징+정렬+검색(2-1) -->
+	<select resultMap="PetdisResMap" id="searchPetdis"  parameterType="java.util.HashMap">
+		SELECT * FROM(SELECT ROW_NUMBER()OVER(
+				<choose>
+				  <when test="condition == 'disnameAsc'">
+				    ORDER BY D.DISNAME ASC
+				  </when>
+				  <when test="condition == 'disnameDesc'">
+				    ORDER BY D.DISNAME DESC
+				  </when>
+				  <when test="condition == 'old'">
+				    ORDER BY D.DISNO ASC
+				  </when>
+				  <when test="condition == 'new'">
+				    ORDER BY D.DISNO DESC
+				  </when>
+				  <otherwise>
+				    ORDER BY D.DISNO DESC
+				  </otherwise>
+				</choose> 
+            ) AS RNUM,
+            D.DISNO, D.PETTYPEID, 
+	                    D.DISNAME, D.DEFINITION, D.CAUSE, 
+	                    D.SYMPTOM, D.TREATMENT, D.TIP, 
+                    D.CREATEDAT, D.UPDATEDAT
+				FROM PETDISEASE D
+				JOIN PETTYPE P ON D.PETTYPEID=P.PETTYPEID
+
+	    <where>
+			<choose>
+			    <when test="searchType == 'pettype'">
+			        D.PETTYPEID = #{search}
+			    </when>
+			    <when test="searchType == 'disname'">
+			        D.DISNAME like #{search}
+			    </when>             
+			    <otherwise>
+			     D.PETTYPEID = #{search}
+			     OR  D.DISNAME like #{search}
+			    </otherwise>
+			</choose>
+	    </where>
+		) A  
+		where  A.rnum  between  #{start}  and #{end}	
+	</select>
+	
+	<!-- 페이징+정렬+검색 카운트(2-2) -->
+	<select resultType="int"  id="searchPetdisCnt"  parameterType="java.util.HashMap">
+	    SELECT COUNT(*)
+				FROM PETDISEASE D
+				JOIN PETTYPE P ON D.PETTYPEID=P.PETTYPEID
+			<where>
+			  <choose>
+			    <when test="searchType == 'pettype'">
+			      D.PETTYPEID = #{search}
+			    </when>
+			    <when test="searchType == 'disname'">
+			      D.DISNAME LIKE #{search}
+			    </when>
+			    <otherwise>
+			      (D.PETTYPEID = #{search} OR D.DISNAME LIKE #{search})
+			    </otherwise>
+			  </choose>
+			</where>
+	</select>
+	</mapper>

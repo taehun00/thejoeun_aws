@@ -1,0 +1,44 @@
+### Gradle / Build ###
+.gradle
+build/
+out/
+*.class
+
+### Maven (사용 시) ###
+target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+
+### IntelliJ ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### VS Code ###
+.vscode/
+
+### OS ###
+.DS_Store
+Thumbs.db
+
+### Logs / Temp ###
+*.log
+*.tmp
+*.bak
+
+### Secrets ###
+.env
+application-*.yml
+application-secret.yml
+application-private.yml
+application-local.yml
+

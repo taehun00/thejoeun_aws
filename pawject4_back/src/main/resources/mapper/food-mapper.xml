@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="com.pawject.dao.food.FoodDao">
+	<resultMap type="com.pawject.dto.food.FoodDto" id="FoodMap">
+	<result property="foodid"	column="FOODID"/>
+	<result property="foodname"	column="FOODNAME"/>
+	<result property="brandid"	column="BRANDID"/>
+	<result property="description"	column="DESCRIPTION"/>
+	<result property="mainingredient"	column="MAININGREDIENT"/>
+	<result property="subingredient"	column="SUBINGREDIENT"/>
+	<result property="pettypeid"	column="PETTYPEID"/>
+	<result property="category"	column="CATEGORY"/>
+	<result property="petagegroup"	column="PETAGEGROUP"/>
+	<result property="isgrainfree"	column="ISGRAINFREE"/>
+	<result property="calorie"	column="CALORIE"/>
+	<result property="foodtype"	column="FOODTYPE"/>
+	<result property="foodimg"	column="FOODIMG"/>
+	<result property="createdat"	column="CREATEDAT"/>
+	<result property="updatedat"	column="UPDATEDAT"/>
+	<result property="brandname"	column="BRANDNAME"/>
+	
+	<result property="country"	column="COUNTRY"/>
+	<result property="brandtype"	column="BRANDTYPE"/>
+	<result property="brandinfo"	column="BRANDINFO"/>
+	</resultMap>
+	
+		
+
+
+
+
+<insert id="foodinsert" parameterType="FoodDto">
+    <selectKey keyProperty="foodid" resultType="int" order="BEFORE">
+        SELECT food_seq.NEXTVAL FROM dual
+    </selectKey>
+
+    INSERT INTO food (
+        foodid,
+        foodname,
+        brandid,
+        description,
+        mainingredient,
+        subingredient,
+        pettypeid,
+        category,
+        petagegroup,
+        isgrainfree,
+        calorie,
+        foodtype,
+        foodimg,
+        createdat,
+        updatedat
+    )
+    VALUES (
+        #{foodid},
+        #{foodname},
+        #{brandid},
+        #{description},
+        #{mainingredient},
+        #{subingredient},
+        #{pettypeid},
+        #{category},
+        #{petagegroup},
+        #{isgrainfree},
+        #{calorie},
+        #{foodtype},
+        #{foodimg},
+        sysdate,
+        null
+    )
+</insert>
+		<select resultMap="FoodMap"  id="foodselectAll">
+		select * from food
+		</select>
+		
+		
+		<select resultMap="FoodMap"    id="foodselectwithBrand" parameterType="int">
+		select f.foodid as foodid, f.foodname as foodname, 	
+				f.brandid as brandid, 
+				f.description as description, 
+				f.mainingredient as mainingredient, f.subingredient as subingredient, 
+				f.pettypeid as pettypeid, f.category as category, 
+				f.petagegroup as petagegroup, f.isgrainfree as isgrainfree, 
+				f.calorie as calorie, f.foodtype as foodtype, f.foodimg as foodimg,
+				f.createdat as createdat, f.updatedat as updatedat,
+				b.brandname as brandname
+		from food f join foodbrand b on (f.brandid=b.brandid)
+		where foodid=#{foodid} 
+		</select>	
+		
+		
+		<select resultType="FoodDtoForList"  id="foodselectForList">
+		select f.foodid as foodid, f.foodname as foodname, 
+        b.brandid as brandid, b.brandname as brandname,
+        f.pettypeid as pettypeid,
+        TO_CHAR(f.createdat, 'YYYY-MM-DD') as createdat, 
+         TO_CHAR(f.updatedat , 'YYYY-MM-DD') as updatedat
+		from food f join foodbrand b on(f.brandid=b.brandid)
+		order by f.foodid desc
+		</select>
+		
+		
+		<select resultMap="FoodMap"    id="foodselect" parameterType="int">
+		select * from food where foodid=#{foodid}
+		</select>
+		
+		<update id="foodupdate" parameterType="FoodDto">
+		update food set foodname=#{foodname}, brandid=#{brandid}, description=#{description}, 
+					mainingredient=#{mainingredient}, subingredient=#{subingredient}, 
+						 pettypeid=#{pettypeid}, category=#{category}, petagegroup=#{petagegroup}, 
+						 isgrainfree=#{isgrainfree}, calorie=#{calorie}, foodtype=#{foodtype}, foodimg=#{foodimg},
+						 updatedat=sysdate  
+						 where foodid=#{foodid} 
+		</update>
+		
+		<delete id="fooddelete" parameterType="int">
+		delete from food where foodid=#{foodid}
+		</delete>
+		
+		
+		<!-- 페이징 -->
+		<select resultMap="FoodMap"  id="foodselect10" parameterType="java.util.Map">
+		   select *
+            from(select row_number() over(
+				<choose>
+				  <when test="condition == 'foodnameAsc'">
+				    ORDER BY F.FOODNAME, F.FOODID
+				  </when>
+				  <when test="condition == 'foodnameDesc'">
+				    ORDER BY F.FOODNAME DESC, F.FOODID DESC
+				  </when>
+				  <when test="condition == 'brandnameAsc'">
+				    ORDER BY B.BRANDNAME, F.FOODNAME, F.FOODID
+				  </when>
+				  <when test="condition == 'brandnameDesc'">
+				    ORDER BY B.BRANDNAME DESC, F.FOODNAME, F.FOODID
+				  </when>
+				  <otherwise>
+				    ORDER BY F.FOODNAME, F.FOODID
+				  </otherwise>
+				</choose>
+            ) as rnum, 
+                    f.foodid as foodid, f.foodname as foodname, 
+                    b.brandid as brandid, b.brandname as brandname,
+                    f.pettypeid as pettypeid,
+                    TO_CHAR(f.createdat, 'YYYY-MM-DD') as createdat, 
+                     TO_CHAR(f.updatedat , 'YYYY-MM-DD') as updatedat
+                    from food f join foodbrand b on(f.brandid=b.brandid) 
+                        ) a 
+           where a.rnum between #{start} and #{end}     
+		</select>
+		
+		<!-- 페이징 카운트 -->
+		<select resultType="int" id="foodselectcnt" >
+			select count(*) from food
+		</select>
+		
+		<!-- 서치 -->
+		
+	<select resultMap="FoodMap" id="foodsearch" parameterType="java.util.HashMap">
+		   select *
+            from(select row_number() over(
+                <choose>
+				  <when test="condition == 'foodnameAsc'">
+				    ORDER BY F.FOODNAME, F.FOODID
+				  </when>
+				  <when test="condition == 'foodnameDesc'">
+				    ORDER BY F.FOODNAME DESC, F.FOODID DESC
+				  </when>
+				  <when test="condition == 'brandnameAsc'">
+				    ORDER BY B.BRANDNAME, F.FOODNAME, F.FOODID
+				  </when>
+				  <when test="condition == 'brandnameDesc'">
+				    ORDER BY B.BRANDNAME DESC, F.FOODNAME, F.FOODID
+				  </when>
+				  <otherwise>
+				    ORDER BY F.FOODNAME, F.FOODID
+				  </otherwise>
+				</choose>
+            ) as rnum, 
+                    f.foodid as foodid, f.foodname as foodname, 
+                    b.brandid as brandid, b.brandname as brandname,
+                    f.pettypeid as pettypeid,
+                    TO_CHAR(f.createdat, 'YYYY-MM-DD') as createdat, 
+                     TO_CHAR(f.updatedat , 'YYYY-MM-DD') as updatedat
+                    from food f join foodbrand b on(f.brandid=b.brandid) 
+             	    <where>
+	        <choose>
+	            <when test="searchType == 'brandname'">
+	              lower(b.brandname) like #{search}
+	            </when>
+	            
+	            <when test="searchType == 'foodname'">
+	                f.foodname like #{search} 
+	            </when>
+	            
+				<when test="searchType == 'pettypeid'">
+				    f.pettypeid = #{search}
+				</when>
+	            
+	            <when test="searchType == 'description'">
+	                f.description like #{search} 
+	            </when>
+	
+	            <when test="searchType == 'mainingredient'">
+	                f.mainingredient like #{search} 
+	            </when>
+	
+	            <when test="searchType == 'subingredient'">
+	                f.subingredient like #{search} 
+	            </when>
+	
+	            <when test="searchType == 'nutrient'">
+	                exists (
+	                    select 1
+	                    from foodnutrient fn join nutrient n on(fn.nutrientid=n.nutrientid)
+	                    where fn.foodid=f.foodid
+	                      and n.nutrientname = #{search} 
+	                )
+	            </when>
+	
+	            <otherwise>
+	                (
+	                    f.foodname like #{search} 
+	                    or f.description like #{search} 
+	                    or f.mainingredient like #{search} 
+	                    or f.subingredient like #{search} 
+				    	or lower(b.brandname) like #{search}
+	                    or exists ( select 1
+	                                from foodnutrient fn join nutrient n on fn.nutrientid = n.nutrientid
+	                                where fn.foodid = f.foodid
+	                                   and n.nutrientname like #{search} 	)
+	                )
+	            </otherwise>
+	        </choose>
+	    </where> 
+        ) a       
+           where a.rnum between #{start} and #{end}    
+	</select>
+
+		<!-- 서치 카운트 -->
+		<select resultType="int" id="foodsearchcnt" parameterType="java.util.HashMap">
+	    select count(*)
+	     from food f join foodbrand b on(f.brandid=b.brandid)
+	    <where>
+	        <choose>
+	            <when test="searchType == 'brandname'">
+	               lower(b.brandname) like #{search}
+	            </when>
+	            
+	            <when test="searchType == 'foodname'">
+	                f.foodname like #{search} 
+	            </when>
+	            
+				<when test="searchType == 'pettypeid'">
+				    f.pettypeid = #{search}
+				</when>
+	            
+	            <when test="searchType == 'description'">
+	                f.description like #{search} 
+	            </when>
+	
+	            <when test="searchType == 'mainingredient'">
+	                f.mainingredient like #{search} 
+	            </when>
+	
+	            <when test="searchType == 'subingredient'">
+	                f.subingredient like #{search} 
+	            </when>
+	
+	            <when test="searchType == 'nutrient'">
+	                exists (
+	                    select 1
+	                    from foodnutrient fn join nutrient n on(fn.nutrientid=n.nutrientid)
+	                    where fn.foodid=f.foodid
+	                      and n.nutrientname = #{search} 
+	                )
+	            </when>
+	
+	            <otherwise>
+	                (
+	                    f.foodname like #{search} 
+	                    or f.description like #{search} 
+	                    or f.mainingredient like #{search} 
+	                    or f.subingredient like #{search} 
+	                    or exists ( select 1
+	                                from foodnutrient fn join nutrient n on fn.nutrientid = n.nutrientid
+	                                where fn.foodid = f.foodid
+	                                   and n.nutrientname like #{search} 	)
+	                )
+	            </otherwise>
+	        </choose>
+	    </where>
+	    order by f.foodid desc
+	</select>
+	
+	
+	<!-- 테스터 연동 -->
+	<resultMap id="FoodNameMap" type="com.pawject.dto.food.FoodDto">
+	  <id property="foodid" column="FOODID"/>
+	  <result property="foodname" column="FOODNAME"/>
+	</resultMap>
+	
+	<select resultMap="FoodNameMap" id="foodselectName" >
+	  select foodid, foodname from food order by foodname
+	</select>
+
+
+	</mapper>

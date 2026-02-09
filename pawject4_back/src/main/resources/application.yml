@@ -1,0 +1,68 @@
+spring:
+  profiles:
+    active: private
+
+  datasource:
+    url: jdbc:oracle:thin:@localhost:1521:XE
+    username: SCOTT
+    password: tiger
+    driver-class-name: oracle.jdbc.OracleDriver
+
+  jpa:
+    hibernate:
+      ddl-auto: update 
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 20MB
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000
+
+  config:
+    import: optional:application-oauth.yml
+            optional:file:.env[.properties]
+
+server:
+  port: 8484
+
+mybatis:
+  config-location: classpath:mybatis-config.xml
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.pawject.domain
+
+  mybatis:
+    configuration:
+      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+jwt:
+  issuer: pawject
+  secret: very-very-long-secret-key-at-least-32-characters
+  access-token-exp-seconds: 900       # 15분
+  refresh-token-exp-seconds: 1209600  # 14일
+  header: Authorization
+  prefix: Bearer
+
+file:
+  upload-dir: /home/ubuntu/app/back/build/libs/uploads
+  #upload-dir: C:/upload
+  upload-path: C:/upload
+
+## 개인 api 오류 방지용 - 빈값 넣어주세요 (공용)
+openai:
+  api:
+    key:
+      hj: ""
+
+naver:
+  ocr:
+    key: ""
+    url: ""

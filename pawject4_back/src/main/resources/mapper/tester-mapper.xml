@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+	<mapper namespace="com.pawject.dao.tester.TesterDao">
+	<resultMap   type="com.pawject.dto.tester.TesterAdminResponseDto" id="testerAdminMap">
+
+	<result property="testerid"	column="TESTERID"/>
+	<result property="category"	column="CATEGORY"/>
+	<result property="title"	    column="TITLE"/>
+	<result property="content"	column="CONTENT"/>
+	<result property="userid"	column="USERID"/>
+	<result property="foodid"	column="FOODID"/>
+	<result property="status"	column="STATUS"/>
+	<result property="views"		column="VIEWS"/>
+	<result property="isnotice"	column="ISNOTICE"/>
+	<result property="posttype"	column="POSTTYPE"/>
+	<result property="deleted"	column="DELETED"/>
+	<result property="createdat"	column="CREATEDAT"/>
+	<result property="updatedat"	column="UPDATEDAT"/>
+	<result property="nickname" column="NICKNAME"/>
+	<result property="foodname" column="FOODNAME"/>
+
+	</resultMap>
+
+	<resultMap   type="com.pawject.dto.tester.TesterUserResponseDto" id="testerUserMap">
+
+	<result property="testerid"	column="TESTERID"/>
+	<result property="category"	column="CATEGORY"/>
+	<result property="title"	    column="TITLE"/>
+	<result property="content"	column="CONTENT"/>
+	<result property="userid"	column="USERID"/>
+	<result property="foodid"	column="FOODID"/>
+	<result property="views"		column="VIEWS"/>
+	<result property="posttype"	column="POSTTYPE"/>
+	<result property="deleted"	column="DELETED"/>
+	<result property="createdat"	column="CREATEDAT"/>
+	<result property="updatedat"	column="UPDATEDAT"/>
+	<result property="nickname" column="NICKNAME"/>
+	<result property="foodname" column="FOODNAME"/>
+
+	</resultMap>
+
+
+<!-- jpa -> mybatis 이전(이미지 이슈)-->
+<!-- 단건조회 -->
+<select id="selectTesterById" parameterType="long" resultMap="testerAdminMap">
+  SELECT
+    T.TESTERID, T.CATEGORY, T.TITLE, T.CONTENT, T.USERID, U.NICKNAME,
+    T.FOODID, F.FOODNAME,
+    T.STATUS, T.VIEWS, T.ISNOTICE, T.POSTTYPE, T.DELETED,
+    T.CREATEDAT, T.UPDATEDAT
+  FROM TESTER T
+  LEFT JOIN USERS U ON T.USERID = U.USERID
+  LEFT JOIN FOOD F ON T.FOODID = F.FOODID
+  WHERE T.TESTERID = #{testerid}
+    AND T.DELETED = 0
+</select>
+
+<!-- 글쓰기(유저) -->
+<insert id="testerUserInsert" parameterType="com.pawject.dto.tester.TesterUserRequestDto">
+  <selectKey keyProperty="testerid" resultType="long" order="BEFORE">
+    SELECT TESTER_SEQ.NEXTVAL FROM DUAL
+  </selectKey>
+
+  INSERT INTO TESTER(
+    TESTERID, USERID, CATEGORY, TITLE, CONTENT, CREATEDAT, UPDATEDAT,
+    FOODID, ISNOTICE, STATUS, POSTTYPE, DELETED, VIEWS
+  )
+  VALUES(
+    #{testerid}, #{userid}, '후기', #{title}, #{content}, SYSDATE, SYSDATE,
+    NVL(#{foodid}, 0), 0, 0, 0, 0, 0
+  )
+</insert>
+
+<!-- 글쓰기(관리자) -->
+<insert id="testerAdminInsert" parameterType="com.pawject.dto.tester.TesterAdminRequestDto">
+  <selectKey keyProperty="testerid" resultType="long" order="BEFORE">
+    SELECT TESTER_SEQ.NEXTVAL FROM DUAL
+  </selectKey>
+
+  INSERT INTO TESTER(
+    TESTERID, USERID, CATEGORY, TITLE, CONTENT, CREATEDAT, UPDATEDAT, FOODID,
+    ISNOTICE, STATUS, POSTTYPE, DELETED, VIEWS
+  )
+  VALUES(
+    #{testerid}, #{userid}, #{category}, #{title}, #{content}, SYSDATE, SYSDATE,
+    NVL(#{foodid}, 0), #{isnotice}, #{status}, 1, 0, 0
+  )
+</insert>
+
+<!-- 수정(유저) -->
+<update id="testerUserUpdate" parameterType="com.pawject.dto.tester.TesterUserRequestDto">
+	UPDATE TESTER SET TITLE=#{title}, CONTENT=#{content}, UPDATEDAT=SYSDATE
+		WHERE TESTERID=#{testerid} AND USERID = #{userid}  AND DELETED = 0
+</update>
+
+
+<!-- 수정(관리자)-->
+<update id="testerAdminUpdate" parameterType="com.pawject.dto.tester.TesterAdminResponseDto">
+	UPDATE TESTER SET TITLE=#{title}, CONTENT=#{content}, UPDATEDAT=SYSDATE, FOODID= #{foodid},
+	CATEGORY=#{category}, ISNOTICE=#{isnotice}, STATUS=#{status}
+		WHERE TESTERID=#{testerid}
+</update>
+
+
+<!-- 삭제-->
+<delete id="testerDBDeleteById" parameterType="long">
+	DELETE FROM TESTER WHERE TESTERID=#{testerid} AND USERID = #{userid}  AND DELETED = 0
+</delete>
+
+<!-- 삭제(소프트딜리트) -->
+<update id="testerDeleteById" parameterType="long">
+    UPDATE TESTER SET DELETED = 1, UPDATEDAT = SYSDATE
+    WHERE TESTERID = #{testerid} AND DELETED = 0
+</update>
+
+<!--조회 영역-->
+<!--페이징+정렬(1)-->
+<select resultMap="testerAdminMap" id="select20Tester" parameterType="java.util.HashMap">
+	SELECT * 
+	FROM(
+	    SELECT ROW_NUMBER()OVER(
+        <choose>
+            <when test="condition == 'old'">
+                ORDER BY T.ISNOTICE DESC, T.TESTERID ASC
+            </when>
+            <when test="condition == 'new'">
+                ORDER BY T.ISNOTICE DESC, T.TESTERID DESC
+            </when>
+
+            <!-- 모집중 우선 정렬 -->
+            <when test="condition == 'open' or condition == 'openOnly'">
+                ORDER BY T.ISNOTICE DESC, T.STATUS ASC, T.TESTERID DESC
+            </when>
+
+            <!-- 모집완료 우선 정렬 -->
+            <when test="condition == 'close' or condition == 'closeOnly'">
+                ORDER BY T.ISNOTICE DESC, T.STATUS DESC, T.TESTERID DESC
+            </when>
+
+            <otherwise>
+                ORDER BY T.ISNOTICE DESC, T.TESTERID DESC
+            </otherwise>
+        </choose>
+	    )
+	    AS RNUM,
+	    T.TESTERID, T.CATEGORY, T.TITLE, T.CONTENT, U.NICKNAME,
+	    T.ISNOTICE, T.STATUS, T.VIEWS, T.POSTTYPE, T.FOODID, F.FOODNAME,
+	    T.CREATEDAT, T.UPDATEDAT, T.DELETED
+	    FROM TESTER T 
+	    LEFT JOIN USERS U ON T.USERID = U.USERID
+	    LEFT JOIN FOOD F ON T.FOODID=F.FOODID
+	    WHERE T.DELETED = 0
+	        <!-- 모집공고 필터 -->
+	    <if test="condition == 'openOnly'">
+	        AND T.POSTTYPE = 1 AND T.STATUS = 0
+	        AND T.CATEGORY = '모집중'
+	    </if>
+	    <if test="condition == 'closeOnly'">
+	        AND T.POSTTYPE = 1 AND T.STATUS = 1
+	    </if>
+	    
+	    )
+	    WHERE RNUM BETWEEN #{start} AND #{end}
+</select>
+
+<!--페이징+정렬-카운트(2)-->
+<select id="countByTesterPaging" resultType="int" parameterType="java.util.HashMap">
+    SELECT COUNT(*)
+    FROM TESTER T
+    WHERE T.DELETED = 0
+    <if test="condition == 'openOnly'">
+        AND T.POSTTYPE = 1 AND T.STATUS = 0
+        AND T.CATEGORY = '모집중'
+    </if>
+    <if test="condition == 'closeOnly'">
+        AND T.POSTTYPE = 1 AND T.STATUS = 1
+    </if>
+</select>
+
+<select resultMap="testerAdminMap" id="searchTester" parameterType="java.util.HashMap">
+SELECT *
+FROM (
+    SELECT ROW_NUMBER() OVER (
+        <choose>
+            <when test="condition == 'old'">
+                ORDER BY T.ISNOTICE DESC, T.TESTERID ASC
+            </when>
+            <when test="condition == 'new'">
+                ORDER BY T.ISNOTICE DESC, T.TESTERID DESC
+            </when>
+
+            <!-- 모집중 우선 정렬 -->
+            <when test="condition == 'open' or condition == 'openOnly'">
+                ORDER BY T.ISNOTICE DESC, T.STATUS ASC, 
+                T.TESTERID DESC
+            </when>
+
+            <!-- 모집완료 우선 정렬 -->
+            <when test="condition == 'close' or condition == 'closeOnly'">
+                ORDER BY T.ISNOTICE DESC, T.STATUS DESC, T.TESTERID DESC
+            </when>
+
+            <otherwise>
+                ORDER BY T.ISNOTICE DESC, T.TESTERID DESC
+            </otherwise>
+        </choose>
+    ) AS RNUM,
+    T.TESTERID, T.CATEGORY, T.TITLE, T.CONTENT, U.NICKNAME,
+    T.ISNOTICE, T.STATUS, T.VIEWS, T.POSTTYPE, T.FOODID,
+    T.CREATEDAT, T.UPDATEDAT, T.DELETED
+    FROM TESTER T
+    LEFT JOIN USERS U ON T.USERID = U.USERID
+    WHERE T.DELETED = 0
+
+    <!-- 모집공고 필터 -->
+    <if test="condition == 'openOnly'">
+        AND T.POSTTYPE = 1 AND T.STATUS = 0
+        AND T.CATEGORY = '모집중'
+    </if>
+    <if test="condition == 'closeOnly'">
+        AND T.POSTTYPE = 1 AND T.STATUS = 1
+    </if>
+
+    <!-- 기존 검색 -->
+    <choose>
+        <when test="searchType == 'title'">
+            AND lower(T.TITLE) like #{search}
+        </when>
+        <when test="searchType == 'content'">
+            AND lower(T.CONTENT) like #{search}
+        </when>
+        <when test="searchType == 'nickname'">
+            AND lower(U.NICKNAME) like #{search}
+        </when>
+        <when test="searchType == 'all'">
+            AND (lower(T.TITLE) like #{search} OR lower(T.CONTENT) like #{search})
+        </when>
+    </choose>
+)
+WHERE RNUM BETWEEN #{start} AND #{end}
+</select>
+
+
+
+<!--페이징+정렬+검색-카운트(4)-->
+<select resultType="int" id="searchTesterCnt" parameterType="java.util.HashMap">
+SELECT COUNT(*)
+    FROM TESTER T 
+    LEFT JOIN USERS U ON T.USERID = U.USERID
+    WHERE T.DELETED = 0
+        <!-- 모집공고 필터 -->
+    <if test="condition == 'openOnly'">
+        AND T.POSTTYPE = 1 AND T.STATUS = 0
+        AND T.CATEGORY = '모집중'
+    </if>
+    <if test="condition == 'closeOnly'">
+        AND T.POSTTYPE = 1 AND T.STATUS = 1
+    </if>
+    <choose>
+        <when test="searchType == 'title'">
+            AND lower(T.TITLE) like #{search}
+        </when>
+        <when test="searchType == 'content'">
+            AND lower(T.CONTENT) like #{search}
+        </when>
+        <when test="searchType == 'nickname'">
+            AND lower(U.NICKNAME) like #{search}
+        </when>
+        <when test="searchType == 'all'">
+            AND (lower(T.TITLE) like #{search} OR lower(T.CONTENT) like #{search})
+        </when>
+    </choose>
+</select>
+
+<!--기능 영역-->
+<!--공지 올리고 내리기 0공지x 1공지중 -->
+<update id="updateIsnotice" parameterType="Long">
+    UPDATE TESTER SET ISNOTICE = CASE WHEN ISNOTICE = 0 THEN 1 ELSE 0 END
+    WHERE TESTERID = #{testerid}
+</update>
+<!--공지 여부 반환-->
+<select id="selectIsnotice" resultType="Long">
+  SELECT ISNOTICE FROM TESTER WHERE TESTERID = #{testerid}
+</select>
+<!--모집 여부 0모집중 1모집완료 -->
+<update id="updateStatus" parameterType="Long">
+    UPDATE TESTER
+    SET
+        STATUS = CASE WHEN STATUS = 0 THEN 1 ELSE 0 END,
+        CATEGORY = CASE
+                     WHEN CATEGORY IN ('모집', '모집중') THEN '모집완료'
+                     WHEN CATEGORY = '모집완료' THEN '모집중'
+                     ELSE CATEGORY
+                   END
+    WHERE TESTERID = #{testerid}
+</update>
+<!--모집 여부 반환-->
+<select id="selectStatus" resultType="Long">
+  SELECT STATUS FROM TESTER WHERE TESTERID = #{testerid}
+</select>
+
+
+
+<!--조회수 증가-->
+<update id="updateViews" parameterType="Long">
+  UPDATE TESTER  SET VIEWS = NVL(VIEWS, 0) + 1
+  WHERE TESTERID = #{testerid}
+</update>
+
+</mapper>

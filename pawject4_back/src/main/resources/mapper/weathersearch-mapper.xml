@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pawject.dao.exec.WeatherSearchDaoo">
+ <resultMap id="weathersearchMap" type="WeatherSearchDto">
+ 	<result property="wid"         column="WID"/>
+ 	<result property="weather"     column="WEATHER"/>
+ 	<result property="weathercontent"     column="WEATHERCONTENT"/>
+ 	
+ </resultMap>
+
+
+ <insert id="insertweather" parameterType="WeatherSearchDto">
+ 	insert INTO saveweather (  WID, WEATHER,    WEATHERCONTENT  )
+	values (   weather_seq.nextval, #{weather}, #{weathercontent} )
+ </insert>
+ 
+<!-- <update id="updateweather" parameterType="WeatherSearchDto">
+ 	update saveweather 
+ 	<set> 
+	 	WEATHER=#{weather}, MAXTEMP=#{maxtemp}, MINTEMP=#{mintemp},
+	    MOISTPERCENT=#{moistpercent} , RAINPERCENT=#{rainpercent}
+    </set>
+	where WID=#{wid}
+ </update>
+--> 
+<!-- <delete id="deleteweather" parameterType="WeatherSearchDto">
+	delete from saveweather where WID=#{wid}
+ </delete>
+--> 
+<!-- <select resultMap="saveweatherMap"  id="selectAllweather" >
+ 	select * from saveweather order by WID desc
+ </select>
+--> 
+ <select resultMap="weathersearchMap"  id="selectweather" parameterType="int">
+ 	select * from saveweather where WID=#{wid}
+ </select>
+ 
+ 
+  <!-- 페이징(1) - saveweather10 -->
+  <select  id="selectweather10"  parameterType="java.util.HashMap"  resultMap="weathersearchMap">
+  	select *
+	from (
+	    select row_number() over (order by BASEDATE desc) as rnum,
+	           WID, WEATHER, WEATHERCONTENT
+	    from saveweather
+	) A
+	where  A.rnum  between  #{start}  and #{end}
+  </select>
+  
+  <!-- 페이징(2) - saveweatherTotalCnt -->
+  <select id="selectweatherTotalCnt" resultType="int">
+  	select count(*) from saveweather
+  </select>
+  
+  <!-- 페이징(3) - saveweather3 -->
+  <select id="selectweather3" parameterType="java.util.HashMap" resultMap="weathersearchMap">
+  	select *
+	from (
+	    select row_number() over (order by BASEDATE desc) as rnum,
+	           WID, WEATHER, WEATHERCONTENT
+	    from saveweather
+	    where WEATHER LIKE '%' || #{search} || '%'
+	) A
+	where  A.rnum  between  #{start}  and #{end}
+  </select>
+  
+  <!-- 페이징(4) - saveweatherSearchTotalCnt -->
+  <select id="selectweatherSearchTotalCnt" parameterType="string" resultType="int">
+  	select count (*) 
+	from saveweather
+	where WEATHER  LIKE '%' || #{search} || '%'
+  </select>
+
+</mapper>
+

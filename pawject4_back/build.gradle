@@ -1,0 +1,80 @@
+plugins {
+   id 'java'
+   id 'org.springframework.boot' version '3.3.5'
+   id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.thejoa703'
+version = '0.0.1-SNAPSHOT'
+description = 'Demo project for Spring Boot'
+
+java {
+   toolchain {
+      languageVersion = JavaLanguageVersion.of(17)
+   }
+}
+
+configurations {
+   compileOnly {
+      extendsFrom annotationProcessor
+   }
+}
+
+repositories {
+   mavenCentral()
+}
+
+dependencies {
+   // 기본스타터
+   implementation 'org.springframework.boot:spring-boot-starter'
+   implementation 'org.springframework.boot:spring-boot-starter-web'
+   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+   implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3' 
+   
+   // 보안 + redis + oauth2.0
+   implementation 'org.springframework.boot:spring-boot-starter-security'
+   implementation 'org.springframework.boot:spring-boot-starter-data-redis' 
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+   
+   // lombok
+   compileOnly 'org.projectlombok:lombok'
+   annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+   
+   // JWT
+   implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+   
+    // Swagger/OpenAPI
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+    //implementation 'org.springdoc:springdoc-openapi-starter-oauth2:2.5.0'   
+   
+   // oracle 
+   //runtimeOnly 'com.oracle.database.jdbc:ojdbc11'
+    runtimeOnly 'com.oracle.database.jdbc:ojdbc6:11.2.0.4'
+    // Gson
+    implementation 'com.google.code.gson:gson:2.11.0'
+    
+    // dotenv
+    implementation 'me.paulschwarz:spring-dotenv:3.0.0'    
+    
+   testImplementation 'org.springframework.boot:spring-boot-starter-test'
+   testImplementation 'org.springframework.security:spring-security-test'
+   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+   useJUnitPlatform()
+}
+// Swagger에서 파라미터 이름 유지
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs.add("-parameters")
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs += "-parameters"
+}
+

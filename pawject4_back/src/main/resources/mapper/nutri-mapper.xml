@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="com.pawject.dao.food.NutriDao">
+	<resultMap type="com.pawject.dto.food.NutriDto" id="NutriMap">
+		<result property="foodid"	column="FOODID"/>
+		<result property="nutrientid"	column="NUTRIENTID"/>
+		<result property="amount"	column="AMOUNT"/>
+		<result property="nutrientname"	column="NUTRIENTNAME"/>
+		<result property="unit"	column="UNIT"/>
+		<result property="rangeid"	column="RANGEID"/>
+		<result property="minvalue"	column="MINVALUE"/>
+		<result property="maxvalue"	column="MAXVALUE"/>
+		<result property="rangelabel"	column="RANGELABEL"/>
+		<result property="pettypeid"	column="PETTYPEID"/>
+	</resultMap>
+	
+	
+	<insert id="nutriinsert" parameterType="NutriDto">
+	insert into foodnutrient(foodid, nutrientid, amount) values(#{foodid}, #{nutrientid}, #{amount})	
+	</insert>
+	
+	<select resultMap="NutriMap" id="nutriselectAll">
+	    select 
+        fn.foodid as foodid,
+        fn.nutrientid as nutrientid,
+        fn.amount as amount,
+        n.nutrientname as nutrientname,
+        n.unit as unit
+    from foodnutrient fn
+    join nutrient n
+        on fn.nutrientid = n.nutrientid
+	</select>
+
+	<select resultMap="NutriMap"  id="nutriselect" parameterType="int">
+	select * from foodnutrient where foodid=#{foodid} order by nutrientid
+	</select>
+	
+	<update id="nutriupdate" parameterType="NutriDto">
+	update foodnutrient set amount=#{amount} where foodid=#{foodid} and nutrientid=#{nutrientid}
+	</update>
+	
+	<delete id="nutridelete" parameterType="NutriDto">
+	delete from foodnutrient where foodid=#{foodid} and nutrientid=#{nutrientid}
+	</delete>
+	
+	<delete id="nutrideleteAll" parameterType="int">
+	delete from foodnutrient where foodid=#{foodid} 
+	</delete>
+	
+	<select resultMap="NutriMap" id="nutriselectForWrite" parameterType="int">
+			select
+		    fn.foodid as foodid, 
+		    fn.nutrientid as nutrientid,
+		    n.nutrientname as nutrientname,
+		    fn.amount as amount,
+		    n.unit as unit,
+		    nr.rangelabel as rangelabel
+		from foodnutrient fn
+		join food f
+		    on fn.foodid = f.foodid
+		join nutrient n
+		    on fn.nutrientid = n.nutrientid
+		join nutrientrange nr
+		    on fn.nutrientid = nr.nutrientid
+		   and f.pettypeid = nr.pettypeid   
+		where fn.foodid = #{foodid}
+		  and fn.amount between nr.minvalue and nr.maxvalue
+		order by fn.nutrientid;
+	</select>
+	
+	<select id="nutrientSelectName" resultType="NutriDto">
+    select nutrientid, nutrientname, unit from nutrient order by nutrientid
+	</select>
+	
+	
+	<select resultMap="NutriMap" id="nutriselectWithInfo" parameterType="int">
+	    select 
+	        fn.foodid as foodid,
+	        fn.nutrientid as nutrientid,
+	        fn.amount as amount,
+	        n.nutrientname as nutrientname,
+	        n.unit as unit
+	    from foodnutrient fn join nutrient n on(fn.nutrientid = n.nutrientid)
+	    where fn.foodid = #{foodid}
+	    order by fn.nutrientid
+	</select>
+	
+	
+	
+	</mapper>

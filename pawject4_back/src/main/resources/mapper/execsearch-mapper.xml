@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pawject.dao.exec.ExecSearchDao">
+ <resultMap id="execsearchMap" type="ExecSearchDto">
+ 	<result property="execid"         column="EXECID"/>
+ 	<result property="exectype"       column="EXECTYPE"/>
+ 	<result property="description"    column="DESCRIPTION"/>
+ 	<result property="avgkcal30min"   column="AVGKCAL30MIN"/>
+ 	<result property="exectargetmin"  column="EXECTARGETMIN"/>
+ 	<result property="suitablefor"    column="SUITABLEFOR"/>
+ 	<result property="intensitylevel" column="INTENSITYLEVEL"/>
+ 	<result property="createdAt"      column="CREATEDAT"/>
+ 	<result property="updatedAt"      column="UPDATEDAT"/>
+ </resultMap>
+ 
+ 
+ <insert id="insertinfo" parameterType="ExecSearchDto">
+ 	insert into exerciseinfo (EXECID, EXECTYPE,   DESCRIPTION,    AVGKCAL30MIN,    EXECTARGETMIN,    SUITABLEFOR,   INTENSITYLEVEL ) 
+	values(exerciseinfo_seq.nextval, #{exectype}, #{description}, #{avgkcal30min}, #{exectargetmin}, #{suitablefor}, #{intensitylevel} )
+ </insert>
+ 
+<!-- <update id="updateinfo" parameterType="ExecinfoDto">
+ 	update exerciseinfo 
+ 	<set>
+	 	 EXECTYPE=#{exectype}, DESCRIPTION=#{description}, AVGKCAL30MIN=#{avgkcal30min}, 
+		 EXECTARGETMIN=#{exectargetmin}, SUITABLEFOR=#{suitablefor}, INTENSITYLEVEL=#{intensitylevel} 
+	</set>
+	where  EXECID=#{execid}
+ </update>-->
+ 
+<!-- <delete id="deleteinfo" parameterType="ExecinfoDto">
+ 	delete from exerciseinfo   where  EXECID=#{execid}
+ </delete>-->
+ 
+<!-- <select resultMap="execimfoMap"  id="selectAllinfo" >
+ 	select * from exerciseinfo order by EXECID desc
+ </select>-->
+ 
+ <select resultMap="execsearchMap"  id="selectinfo" parameterType="int">
+ 	select * from exerciseinfo where EXECID=#{execid}
+ </select>
+
+
+  <!-- 페이징(1) - selectinfo10 -->
+  <select id="selectinfo10" parameterType="java.util.HashMap" resultMap="execsearchMap">
+  	select * 
+	from ( 
+	    select row_number() over (order by CREATEDAT desc) as rnum,
+	    EXECID, EXECTYPE, DESCRIPTION, AVGKCAL30MIN, EXECTARGETMIN, SUITABLEFOR, 
+	    INTENSITYLEVEL, CREATEDAT, UPDATEDAT
+	    from exerciseinfo 
+	) A 
+	where  A.rnum  between  #{start}  and #{end}
+  </select>
+  
+  <!-- 페이징(2) - selectinfoTotalCnt -->
+ <select id="selectinfoTotalCnt" resultType="int">
+  	select count(*) from exerciseinfo
+  </select>
+  
+  <!-- 페이징(3) - selectinfo3 -->
+  <select id="selectinfo3" parameterType="java.util.HashMap" resultMap="execsearchMap">
+	  select *
+	  from (
+	    select row_number() over (order by CREATEDAT desc) as rnum,
+	           EXECID, EXECTYPE, DESCRIPTION, AVGKCAL30MIN, EXECTARGETMIN, SUITABLEFOR,
+	           INTENSITYLEVEL, CREATEDAT, UPDATEDAT
+	    from exerciseinfo
+	    where EXECTYPE LIKE '%' || #{search} || '%'
+	  ) A
+	  where A.rnum between #{start} and #{end}
+  </select>
+  
+  <!-- 페이징(4) - selectinfoSearchTotalCnt -->
+  <select id="selectinfoSearchTotalCnt" parameterType="string" resultType="int">
+  	select count (*) 
+	from exerciseinfo
+	where EXECTYPE  LIKE '%' || #{search} || '%'
+  </select>
+
+</mapper>
+
