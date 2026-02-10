@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: private
+    active: local
 
   datasource:
     url: jdbc:oracle:thin:@localhost:1521:XE
@@ -32,8 +32,13 @@ spring:
     import: optional:application-oauth.yml
             optional:file:.env[.properties]
 
+app:
+  oauth2:
+    redirect-url: http://3.38.218.56/oauth2/callback
+    #redirect-url: http://localhost:3000/oauth2/callback
+
 server:
-  port: 8080
+  port: 8484
 
 mybatis:
   config-location: classpath:mybatis-config.xml
