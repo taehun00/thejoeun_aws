@@ -37,8 +37,6 @@ Thumbs.db
 
 ### Secrets ###
 .env
-application-*.yml
 application-secret.yml
 application-private.yml
-application-local.yml
 

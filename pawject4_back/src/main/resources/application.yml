@@ -29,8 +29,8 @@ spring:
       timeout: 2000
 
   config:
-    import: optional:application-oauth.yml
-            optional:file:.env[.properties]
+    import: 
+      - optional:file:.env[.properties]
 
 app:
   oauth2:
