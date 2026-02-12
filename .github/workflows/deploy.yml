@@ -48,6 +48,7 @@ jobs:
 
       - name: Create Backend .env from Secrets
         run: |
+          echo "DB_URL=${{ secrets.DB_URL }}" >> pawject4_back/.env
           echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> pawject4_back/.env
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> pawject4_back/.env
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> pawject4_back/.env
