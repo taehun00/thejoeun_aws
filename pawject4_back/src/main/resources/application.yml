@@ -3,9 +3,9 @@ spring:
     active: local
 
   datasource:
-    url: jdbc:oracle:thin:@localhost:1521:xe
-    username: SCOTT
-    password: tiger
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: oracle.jdbc.OracleDriver
 
   jpa:
