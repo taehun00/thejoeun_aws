@@ -1,9 +1,9 @@
 spring:
   profiles:
-    active: local
+    active: private
 
   datasource:
-    url: jdbc:oracle:thin:@localhost:1521:XE
+    url: jdbc:oracle:thin:@localhost:1521/xe
     username: SCOTT
     password: tiger
     driver-class-name: oracle.jdbc.OracleDriver
@@ -29,13 +29,7 @@ spring:
       timeout: 2000
 
   config:
-    import: 
-      - optional:file:.env[.properties]
-
-app:
-  oauth2:
-    redirect-url: http://3.38.218.56/oauth2/callback
-    #redirect-url: http://localhost:3000/oauth2/callback
+    import: optional:application-oauth.yml
 
 server:
   port: 8484
@@ -57,8 +51,7 @@ jwt:
   prefix: Bearer
 
 file:
-  upload-dir: /home/ubuntu/app/back/build/libs/uploads
-  #upload-dir: C:/upload
+  upload-dir: C:/upload
   upload-path: C:/upload
 
 ## 개인 api 오류 방지용 - 빈값 넣어주세요 (공용)

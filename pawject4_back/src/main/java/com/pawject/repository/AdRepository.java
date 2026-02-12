@@ -38,4 +38,6 @@ public interface AdRepository extends JpaRepository<Ad, Long> {
     )
     List<Ad> findAdsWithPaging(@Param("start") int start, @Param("end") int end);
 
+	//List<Ad> findTop10ByActiveTrueOrderByCreatedAtDesc();
+
 }

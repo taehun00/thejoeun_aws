@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   ads: [],
-  //activeAds: [], // 메인 페이지용 광고 목록 추가
+  latestAds: [],   // ✅ 추가: 최신 광고 페이징 조회 결과를 저장할 상태
   currentAd: null,
   loading: false,
   error: null,
@@ -12,7 +12,8 @@ const adSlice = createSlice({
   name: 'ad',
   initialState,
   reducers: {
-    fetchAdRequest: (state, action) => {
+    // 광고 단건 조회
+    fetchAdRequest: (state) => {
       state.loading = true;
       state.error = null;
     },
@@ -26,7 +27,8 @@ const adSlice = createSlice({
       state.currentAd = null;
     },
 
-    createAdRequest: (state, action) => {
+    // 광고 작성
+    createAdRequest: (state) => {
       state.loading = true;
       state.error = null;
     },
@@ -39,12 +41,14 @@ const adSlice = createSlice({
       state.error = action.payload;
     },
 
-    updateAdRequest: (state, action) => {
+    // 광고 수정
+    updateAdRequest: (state) => {
       state.loading = true;
       state.error = null;
     },
     updateAdSuccess: (state, action) => {
       state.loading = false;
+      // 기존 ads 배열에서 해당 광고를 찾아 교체
       state.ads = state.ads.map((ad) =>
         ad.id === action.payload.id ? action.payload : ad
       );
@@ -55,7 +59,8 @@ const adSlice = createSlice({
       state.error = action.payload;
     },
 
-    deleteAdRequest: (state, action) => {
+    // 광고 삭제
+    deleteAdRequest: (state) => {
       state.loading = true;
       state.error = null;
     },
@@ -70,39 +75,37 @@ const adSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    
+
+    // ✅ 추가: 최신 광고 페이징 조회
+    fetchLatestAdsRequest: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+    fetchLatestAdsSuccess: (state, action) => {
+      state.loading = false;
+      //state.latestAds = action.payload; // 최신 광고 목록 저장
+      // ✅ 응답이 Page 객체라면 content만 저장, 배열이면 그대로 저장 
+      state.latestAds = action.payload?.content || action.payload || [];
+    },
+    fetchLatestAdsFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+
+    // 에러 초기화
     clearAdError: (state) => {
       state.error = null;
-    }
+    },
   },
-
-    // 리듀서 로직에 추가
-    // 2. 메인 페이지 활성 광고 조회 요청
-    // fetchActiveAdsRequest: (state) => {
-    //   state.loading = true;
-    //   state.error = null;
-    // },
-    // 3. 메인 페이지 활성 광고 조회 성공 (보내주신 로직 적용)
-    // fetchActiveAdsSuccess: (state, action) => {
-    //   state.activeAds = action.payload;
-    //   state.loading = false;
-    // },
-    // 4. 실패 시 공통 처리
-    // fetchActiveAdsFailure: (state, action) => {
-    //   state.loading = false;
-    //   state.error = action.payload;
-    // },
-
 });
+
 export const {
   fetchAdRequest, fetchAdSuccess, fetchAdFailure,
   createAdRequest, createAdSuccess, createAdFailure,
   updateAdRequest, updateAdSuccess, updateAdFailure,
   deleteAdRequest, deleteAdSuccess, deleteAdFailure,
-  //fetchActiveAdsRequest, fetchActiveAdsSuccess, fetchActiveAdsFailure, 
-  clearAdError
+  fetchLatestAdsRequest, fetchLatestAdsSuccess, fetchLatestAdsFailure, // ✅ 추가된 액션 export
+  clearAdError,
 } = adSlice.actions;
-
-
 
 export default adSlice.reducer;

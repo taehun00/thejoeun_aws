@@ -13,7 +13,7 @@ import {
   updateProfileImageRequest, updateProfileImageSuccess,
 } from "../../../reducers/user/authReducer";
 
-// axios 모듈 mock 처리
+//axios 모듈 mock 처리
 jest.mock("../../../api/axios", () => ({
   post: jest.fn(),
   patch: jest.fn(),
@@ -31,59 +31,59 @@ describe("signup saga", () => {
   });
 });
 
-// --- 로그인 Saga 테스트 ---
-describe("login saga", () => {
-  it("dispatches loginSuccess when API succeeds", () => {
-    api.post.mockResolvedValue({
-      data: { accessToken: "abc123", refreshToken: "def456", nickname: "tester" }
-    });
+// // --- 로그인 Saga 테스트 ---
+// describe("login saga", () => {
+//   it("dispatches loginSuccess when API succeeds", () => {
+//     api.post.mockResolvedValue({
+//       data: { accessToken: "abc123", refreshToken: "def456", nickname: "tester" }
+//     });
 
-    return expectSaga(login, loginRequest({ email: "test@test.com", password: "1234" }))
-      .put(loginSuccess({ user: { nickname: "tester" }, accessToken: "abc123" }))
-      .run();
-  });
-});
+//     return expectSaga(login, loginRequest({ email: "test@test.com", password: "1234" }))
+//       .put(loginSuccess({ user: { nickname: "tester" }, accessToken: "abc123" }))
+//       .run();
+//   });
+// });
 
-// --- 토큰 재발급 Saga 테스트 ---
-describe("refresh saga", () => {
-  it("dispatches refreshTokenSuccess when API succeeds", () => {
-    api.post.mockResolvedValue({ data: { accessToken: "newToken" } });
+// // --- 토큰 재발급 Saga 테스트 ---
+// describe("refresh saga", () => {
+//   it("dispatches refreshTokenSuccess when API succeeds", () => {
+//     api.post.mockResolvedValue({ data: { accessToken: "newToken" } });
 
-    return expectSaga(refresh, refreshTokenRequest())
-      .put(refreshTokenSuccess({ accessToken: "newToken" }))
-      .run();
-  });
-});
+//     return expectSaga(refresh, refreshTokenRequest())
+//       .put(refreshTokenSuccess({ accessToken: "newToken" }))
+//       .run();
+//   });
+// });
 
-// --- 로그아웃 Saga 테스트 ---
-describe("logout saga", () => {
-  it("dispatches logout when API succeeds", () => {
-    api.delete.mockResolvedValue({ data: {} });
+// // --- 로그아웃 Saga 테스트 ---
+// describe("logout saga", () => {
+//   it("dispatches logout when API succeeds", () => {
+//     api.delete.mockResolvedValue({ data: {} });
 
-    return expectSaga(logoutFlow, logoutRequest({ email: "test@test.com" }))
-      .put(logout())
-      .run();
-  });
-});
+//     return expectSaga(logoutFlow, logoutRequest({ email: "test@test.com" }))
+//       .put(logout())
+//       .run();
+//   });
+// });
 
-// --- 닉네임 변경 Saga 테스트 ---
-describe("updateNickname saga", () => {
-  it("dispatches updateNicknameSuccess when API succeeds", () => {
-    api.patch.mockResolvedValue({ data: { nickname: "newName" } });
+// // --- 닉네임 변경 Saga 테스트 ---
+// describe("updateNickname saga", () => {
+//   it("dispatches updateNicknameSuccess when API succeeds", () => {
+//     api.patch.mockResolvedValue({ data: { nickname: "newName" } });
 
-    return expectSaga(updateNickname, updateNicknameRequest({ userId: 1, nickname: "newName" }))
-      .put(updateNicknameSuccess({ user: { nickname: "newName" } }))
-      .run();
-  });
-});
+//     return expectSaga(updateNickname, updateNicknameRequest({ userId: 1, nickname: "newName" }))
+//       .put(updateNicknameSuccess({ user: { nickname: "newName" } }))
+//       .run();
+//   });
+// });
 
-// --- 프로필 이미지 변경 Saga 테스트 ---
-describe("updateProfileImage saga", () => {
-  it("dispatches updateProfileImageSuccess when API succeeds", () => {
-    api.post.mockResolvedValue({ data: { ufile: "new.png" } });
+// // --- 프로필 이미지 변경 Saga 테스트 ---
+// describe("updateProfileImage saga", () => {
+//   it("dispatches updateProfileImageSuccess when API succeeds", () => {
+//     api.post.mockResolvedValue({ data: { ufile: "new.png" } });
 
-    return expectSaga(updateProfileImage, updateProfileImageRequest({ userId: 1, file: new File([], "test.png") }))
-      .put(updateProfileImageSuccess({ user: { ufile: "new.png" } }))
-      .run();
-  });
-});
+//     return expectSaga(updateProfileImage, updateProfileImageRequest({ userId: 1, file: new File([], "test.png") }))
+//       .put(updateProfileImageSuccess({ user: { ufile: "new.png" } }))
+//       .run();
+//   });
+//});

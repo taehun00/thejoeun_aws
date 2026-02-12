@@ -1,6 +1,7 @@
 package com.pawject.service.exec;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +53,20 @@ public class AdService {
         Ad ad = adRepository.findById(adId)
                 .orElseThrow(() -> new RuntimeException("Ad not found"));
         return new AdResponseDto(ad);
+    }
+    
+    /**
+     * 오라클 네이티브 쿼리를 이용한 최신 광고 페이징 조회
+     * @param start 시작 rownum
+     * @param end   끝 rownum
+     * @return 최신 광고 목록
+     */
+    @Transactional(readOnly = true)
+    public List<AdResponseDto> getLatestAdsWithPaging(int start, int end) {
+        List<Ad> ads = adRepository.findAdsWithPaging(start, end);
+        return ads.stream()
+                  .map(AdResponseDto::new)
+                  .toList();
     }
     
     

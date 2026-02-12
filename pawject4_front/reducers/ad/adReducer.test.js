@@ -1,17 +1,17 @@
-// reducers/adReducer.js
+// reducers/adReducer.test.js
 import reducer, {
   fetchAdRequest, fetchAdSuccess, fetchAdFailure,
   createAdRequest, createAdSuccess, createAdFailure,
   updateAdRequest, updateAdSuccess, updateAdFailure,
   deleteAdRequest, deleteAdSuccess, deleteAdFailure,
-  //fetchActiveAdsRequest, fetchActiveAdsSuccess, fetchActiveAdsFailure,
+  fetchLatestAdsRequest, fetchLatestAdsSuccess, fetchLatestAdsFailure, // ✅ 추가된 액션 import
   clearAdError
 } from './adReducer';
 
 describe('ad reducer', () => {
   const initialState = {
     ads: [],
-    //activeAds: [],
+    latestAds: [],   // ✅ 추가된 상태
     currentAd: null,
     loading: false,
     error: null,
@@ -83,24 +83,23 @@ describe('ad reducer', () => {
     expect(state.error).toBeNull();
   });
 
- // ✅ 추가된 테스트들
-  // it('handles fetchActiveAdsRequest', () => {
-  //   const state = reducer(initialState, fetchActiveAdsRequest());
-  //   expect(state.loading).toBe(true);
-  //   expect(state.error).toBeNull();
-  // });
+  // ✅ 추가된 테스트: 최신 광고 페이징 조회
+  it('handles fetchLatestAdsRequest', () => {
+    const state = reducer(initialState, fetchLatestAdsRequest());
+    expect(state.loading).toBe(true);
+    expect(state.error).toBeNull();
+  });
 
-  // it('handles fetchActiveAdsSuccess', () => {
-  //   const ads = [{ id: 1, title: '활성 광고' }];
-  //   const state = reducer(initialState, fetchActiveAdsSuccess(ads));
-  //   expect(state.activeAds).toEqual(ads);
-  //   expect(state.loading).toBe(false);
-  // });
+  it('handles fetchLatestAdsSuccess', () => {
+    const ads = [{ id: 1, title: '최신 광고' }];
+    const state = reducer(initialState, fetchLatestAdsSuccess(ads));
+    expect(state.latestAds).toEqual(ads);   // ✅ 최신 광고 배열에 저장되는지 확인
+    expect(state.loading).toBe(false);
+  });
 
-  // it('handles fetchActiveAdsFailure', () => {
-  //   const state = reducer(initialState, fetchActiveAdsFailure('fail'));
-  //   expect(state.error).toBe('fail');
-  //   expect(state.loading).toBe(false);
-  // });
-
+  it('handles fetchLatestAdsFailure', () => {
+    const state = reducer(initialState, fetchLatestAdsFailure('fail'));
+    expect(state.error).toBe('fail');
+    expect(state.loading).toBe(false);
+  });
 });
