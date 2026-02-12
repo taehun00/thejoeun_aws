@@ -3,7 +3,7 @@ spring:
     active: private
 
   datasource:
-    url: jdbc:oracle:thin:@localhost:1521/xe
+    url: jdbc:oracle:thin:@localhost:1521:xe
     username: SCOTT
     password: tiger
     driver-class-name: oracle.jdbc.OracleDriver
@@ -30,6 +30,7 @@ spring:
 
   config:
     import: optional:application-oauth.yml
+      - optional:file:.env[.properties]
 
 server:
   port: 8484
@@ -51,7 +52,8 @@ jwt:
   prefix: Bearer
 
 file:
-  upload-dir: C:/upload
+  upload-dir: /home/ubuntu/app/back/build/libs/uploads
+  #upload-dir: C:/upload
   upload-path: C:/upload
 
 ## 개인 api 오류 방지용 - 빈값 넣어주세요 (공용)

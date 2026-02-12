@@ -53,7 +53,8 @@ dependencies {
     //implementation 'org.springdoc:springdoc-openapi-starter-oauth2:2.5.0'   
    
    // oracle 
-   runtimeOnly 'com.oracle.database.jdbc:ojdbc11'
+   //runtimeOnly 'com.oracle.database.jdbc:ojdbc11'
+   runtimeOnly 'com.oracle.database.jdbc:ojdbc6:11.2.0.4'
     
     // Gson
     implementation 'com.google.code.gson:gson:2.11.0'
