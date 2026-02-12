@@ -72,7 +72,8 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "${{ env.JAR_FILE }}"
-          target: "/home/ubuntu/app/pawject4_back/build/libs"
+          target: "/home/ubuntu/app"
+
 
 
       - name: Create .env on EC2
@@ -119,11 +120,10 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /home/ubuntu/app/pawject4_back/build/libs
+            cd /home/ubuntu/app
             pm2 delete backend || true
             export $(cat /home/ubuntu/app/.env | xargs)
             pm2 start java --name backend -- -jar pawject4-0.0.1-SNAPSHOT.jar --server.port=8484
-
 
 
   frontend:
