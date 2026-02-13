@@ -93,7 +93,7 @@ jobs:       # 실행할 job 정의
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          script: ls -lh /home/ubuntu/app/back/build/libs
+          script: ls -lh /home/ubuntu/app/
 
  
       - name: Copy Backend .env to EC2
@@ -148,6 +148,10 @@ jobs:       # 실행할 job 정의
         with:
           node-version: '18'
 
+      # 폴더 먼저 보장
+      - name: Ensure front folder exists
+        run: mkdir -p pawject4_front
+
       # 🔑 Secrets 기반으로 .env.production 먼저 생성
       - name: Create .env.production
         run: |
@@ -162,9 +166,9 @@ jobs:       # 실행할 job 정의
 
       - name: Debug Frontend Files
         run: |
-          ls -al front
-          ls -al front/.next || true
-          ls -al front/public || true
+          ls -al pawject4_front
+          ls -al pawject4_front/.next || true
+          ls -al pawject4_front/public || true
 
       - name: Ensure front directory exists on EC2
         uses: appleboy/ssh-action@v0.1.7
