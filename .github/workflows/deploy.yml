@@ -83,7 +83,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cat <<EOF > /home/ubuntu/app/.env
+            cat <<EOF > /home/ubuntu/app/pawject4_back/.env
             DB_USERNAME=${{ secrets.DB_USERNAME }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
@@ -202,4 +202,4 @@ jobs:
             pm2 start npm --name "frontend" -- run start
 
 
-# ...
+# ....
