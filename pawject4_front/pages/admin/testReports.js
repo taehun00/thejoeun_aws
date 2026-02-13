@@ -10,7 +10,7 @@ export default function TestReportsPage() {
   useEffect(() => {
     const token = localStorage.getItem("accessToken"); // 관리자 토큰 필요
     axios
-      .get("http://localhost:8484/api/admin/reports?page=0&size=10", {
+      .get("${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/reports?page=0&size=10", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

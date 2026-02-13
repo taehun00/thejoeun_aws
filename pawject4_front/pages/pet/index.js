@@ -40,7 +40,7 @@ export default function PetDetailPage() {
       <p>성별: {pet.pgender}</p>
 
       <img
-        src={`http://localhost:8484/uploads/${pet.imageUrl || "default.png"}`}
+        src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${pet.imageUrl || "default.png"}`}
         alt={pet.petName}
         style={{ width: 200, marginTop: 10 }}
       />
