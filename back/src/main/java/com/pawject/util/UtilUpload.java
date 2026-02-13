@@ -13,21 +13,21 @@ import org.springframework.web.multipart.MultipartFile;
 public class UtilUpload {
 
 
-    @Value("${file.upload-path}")
-    private String uploadPath;
+    // @Value("${file.upload-path}")
+    // private String uploadPath;
     
     @Value("${file.upload-dir}")
     private String uploadDir;
     //기존 메서드
-    public String fileUpload(MultipartFile file) throws IOException {
-        UUID uid = UUID.randomUUID();
-        String save = uid + "_" + file.getOriginalFilename();
+    // public String fileUpload(MultipartFile file) throws IOException {
+    //     UUID uid = UUID.randomUUID();
+    //     String save = uid + "_" + file.getOriginalFilename();
 
-        File target = new File(uploadPath, save);
-        FileCopyUtils.copy(file.getBytes(), target);
+    //     File target = new File(uploadPath, save);
+    //     FileCopyUtils.copy(file.getBytes(), target);
 
-        return save;
-    }
+    //     return save;
+    // }
     //신규 - 경로 같이 저장
     public String fileUpload(MultipartFile file, String subDir) throws IOException {
         UUID uid = UUID.randomUUID();
