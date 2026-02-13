@@ -20,21 +20,21 @@ jobs:       # 실행할 job 정의
 
       - name: Grant execute permission for gradlew  
         run: chmod +x ./gradlew       # gradlew 실행권한
-        working-directory: pawject4_back       # back 디렉토리에서실행  ##
+        working-directory: back       # back 디렉토리에서실행  ##
 
       - name: Build Spring Boot App
         run: ./gradlew clean build -x test  # 테스트제외하고 빌드
-        working-directory: pawject4_back      # back 디렉토리
+        working-directory: back      # back 디렉토리
 
       - name: Debug Backend Files
         run: |
-          echo "=== pawject4_back 디렉터리 ==="
-          ls -al pawject4_back
+          echo "=== back 디렉터리 ==="
+          ls -al back
           echo "=== build/libs 디렉터리 ==="
-          ls -al pawject4_back/build/libs
+          ls -al back/build/libs
 
       - name: Find JAR file (fat jar만 선택)
-        run: echo "JAR_FILE=$(ls pawject4_back/build/libs/*SNAPSHOT.jar | grep -v plain | head -n 1)" >> $GITHUB_ENV
+        run: echo "JAR_FILE=$(ls back/build/libs/*SNAPSHOT.jar | grep -v plain | head -n 1)" >> $GITHUB_ENV
         # plain.jar 제외하고 실행 가능한 fat JAR만 선택
 
       - name: Debug JAR_FILE
@@ -44,21 +44,21 @@ jobs:       # 실행할 job 정의
         run: |
           if [ ! -f "${{ env.JAR_FILE }}" ]; then
             echo "❌ JAR file not found: ${{ env.JAR_FILE }}"
-            ls -al pawject4_back/build/libs
+            ls -al back/build/libs
             exit 1
           fi
           echo "✅ JAR file found: ${{ env.JAR_FILE }}"
 
       - name: Create Backend .env from Secrets
         run: |                     # secrets 기반으로 .env 파일 생성
-          echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> pawject4_back/.env
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> pawject4_back/.env
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> pawject4_back/.env
-          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> pawject4_back/.env
-          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> pawject4_back/.env
-          echo "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> pawject4_back/.env
-          echo "NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}" >> pawject4_back/.env
-          echo "NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}" >> pawject4_back/.env
+          echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> back/.env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> back/.env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> back/.env
+          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> back/.env
+          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> back/.env
+          echo "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> back/.env
+          echo "NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}" >> back/.env
+          echo "NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}" >> back/.env
 
       - name: Ensure app directory exists on EC2
         uses: appleboy/ssh-action@v0.1.7                 #   EC2 접속후 디렉토리 생성
@@ -93,7 +93,7 @@ jobs:       # 실행할 job 정의
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          script: ls -lh /home/ubuntu/app/
+          script: ls -lh /home/ubuntu/app/back/build/libs
 
  
       - name: Copy Backend .env to EC2
@@ -102,7 +102,7 @@ jobs:       # 실행할 job 정의
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "pawject4_back/.env"
+          source: "back/.env"
           target: "/home/ubuntu/app"
 
 
@@ -132,9 +132,9 @@ jobs:       # 실행할 job 정의
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /home/ubuntu/app
+            cd /home/ubuntu/app/back/build/libs
             pm2 delete backend || true
-            export $(cat pawject4_back/.env | xargs)
+            export $(cat /home/ubuntu/app/back/.env | xargs)
             pm2 start java --name backend -- -jar pawject4-0.0.1-SNAPSHOT.jar
 
   frontend:
@@ -148,27 +148,23 @@ jobs:       # 실행할 job 정의
         with:
           node-version: '18'
 
-      # 폴더 먼저 보장
-      - name: Ensure front folder exists
-        run: mkdir -p pawject4_front
-
       # 🔑 Secrets 기반으로 .env.production 먼저 생성
-      - name: Create .env.production
+      - name: Create Frontend .env.production
         run: |
-          echo "NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL }}" > pawject4_front/.env.production
+          echo "NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL }}" > front/.env.production
 
       # 빌드 전에 .env.production이 반영되도록 순서 조정   
       - name: Build Frontend
         run: |
           npm install
           npm run build -- --no-lint
-        working-directory: pawject4_front
+        working-directory: front
 
       - name: Debug Frontend Files
         run: |
-          ls -al pawject4_front
-          ls -al pawject4_front/.next || true
-          ls -al pawject4_front/public || true
+          ls -al front
+          ls -al front/.next || true
+          ls -al front/public || true
 
       - name: Ensure front directory exists on EC2
         uses: appleboy/ssh-action@v0.1.7
@@ -181,7 +177,7 @@ jobs:       # 실행할 job 정의
       # 빌드 결과물(.next, public, package.json,   .env.production)을 압축     
       - name: Archive frontend build
         run: |
-          cd pawject4_front
+          cd front
           tar -czf ../frontend-build.tar.gz .next public package.json .env.production
 
       - name: Copy frontend archive to EC2
