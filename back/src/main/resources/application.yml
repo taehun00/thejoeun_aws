@@ -27,11 +27,11 @@ spring:
 
   config:
     import: 
-      - optional:application-local.yml
+      - optional:application-oauth.yml
       - optional:file:.env[.properties]
 
 server:
-  port: 8080
+  port: 8484
 
 mybatis:
   config-location: classpath:mybatis-config.xml
@@ -43,7 +43,7 @@ mybatis:
       log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 jwt:
   issuer: pawject
-  secret: very-very-long-secret-key-at-least-32-characters
+  secret: ${JWT_SECRET}
   access-token-exp-seconds: 900       # 15분
   refresh-token-exp-seconds: 1209600  # 14일
   header: Authorization
