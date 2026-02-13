@@ -40,7 +40,7 @@ target/
 build/
 .gradle/
 .gradle-cache/
-!**/gradle/wrapper/gradle-wrapper.jar
+!gradle-wrapper.jar   # gradle wrapper는 
 
 # =========================
 # Docker
