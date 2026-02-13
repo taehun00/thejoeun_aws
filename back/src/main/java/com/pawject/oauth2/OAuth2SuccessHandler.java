@@ -39,7 +39,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final JwtProvider jwtProvider;  // JWT 토큰 발급/검증
     private final TokenStore tokenStore;  // Redis  - Refresh Token
     private final JwtProperties props;  // JWT 토큰 - 출입증
- 
+
     @Value("${app.oauth2.redirect-url}")
     private String redirectUrl;  //   Access Token 을 프론트엔드(react)로 리다이렉트하면서 전달
 
