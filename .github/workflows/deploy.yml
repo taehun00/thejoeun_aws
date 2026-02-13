@@ -19,7 +19,7 @@ jobs:       # 실행할 job 정의
           distribution: 'temurin'    
 
       - name: Grant execute permission for gradlew  
-        run: chmod +x ./pawject4_back/gradlew       # gradlew 실행권한
+        run: chmod +x ./gradlew       # gradlew 실행권한
         working-directory: pawject4_back       # back 디렉토리에서실행  ##
 
       - name: Build Spring Boot App
@@ -149,7 +149,7 @@ jobs:       # 실행할 job 정의
           node-version: '18'
 
       # 🔑 Secrets 기반으로 .env.production 먼저 생성
-      - name: Create Frontend .env.production
+      - name: Create .env.production
         run: |
           echo "NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL }}" > pawject4_front/.env.production
 
