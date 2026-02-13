@@ -53,6 +53,12 @@ file:
   upload-path: /home/ubuntu/app/back/build/libs/uploads
   upload-dir: /home/ubuntu/app/back/build/libs/uploads
 
+
+app:
+  oauth2:
+    redirect-url: http://3.38.218.56/oauth2/callback
+    #redirect-url: http://localhost:3000/oauth2/callback
+
 ## 개인 api 오류 방지용 - 빈값 넣어주세요 (공용)
 openai:
   api:
