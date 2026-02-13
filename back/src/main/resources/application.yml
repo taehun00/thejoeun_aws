@@ -53,7 +53,7 @@ jwt:
   prefix: Bearer
 
 file:
-#  upload-dir: uploads
+  upload-path: /home/ubuntu/app/back/build/libs/uploads
   upload-dir: /home/ubuntu/app/back/build/libs/uploads
 
 ## 개인 api 오류 방지용 - 빈값 넣어주세요 (공용)
