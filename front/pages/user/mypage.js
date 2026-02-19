@@ -50,8 +50,8 @@ export default function MyPage() {
           <>
           <div style={{ display: "flex", alignItems: "center", marginBottom: 10 }}>
             <img
-              src={fileUrl(`userimg/${user.ufile}`) || fileUrl("userimg/default.png")}
-              alt={user.nickname}
+              src={fileUrl(`userimg/${user?.ufile}`) || fileUrl("userimg/default.png")}
+              alt={user?.nickname || "user"}
               style={{ width: 80, height: 80, borderRadius: "50%", marginRight: 15 }}
             />
             </div>
@@ -85,8 +85,8 @@ export default function MyPage() {
                 <p>나이: {pet.page}</p>
                 <p>성별: {pet.pgender}</p>
                 <img
-                  src={fileUrl(`petimg/${pet.imageUrl}`) || fileUrl("petimg/default.png")}
-                  alt={pet.petName}
+                  src={fileUrl(`petimg/${pet?.pFile}`) || fileUrl("petimg/default.png")}
+                  alt={pet?.petName || "pet"}
                   style={{ width: 150, marginTop: 10 }}
                 />
                 <div style={{ marginTop: 15 }}>
