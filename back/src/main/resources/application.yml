@@ -52,8 +52,8 @@ jwt:
   prefix: Bearer
 
 file:
-  upload-path: /home/ubuntu/app/back/build/libs/uploads
-  upload-dir: /home/ubuntu/app/back/build/libs/uploads
+  upload-path: /home/ubuntu/app/back/build/libs/upload
+  upload-dir: /home/ubuntu/app/back/build/libs/upload
 
 
 app:
