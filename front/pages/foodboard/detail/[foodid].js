@@ -82,7 +82,7 @@ const getFoodImageUrl = (fdto) => {
       ? fdto.foodimg
       : `foodimg/${fdto.foodimg}`;
 
-    return `${API_URL}/uploads/${imgPath}`;
+    return `/${imgPath}`;
   }
 
   if (fdto.brandid) return `/foodimg/brand0${fdto.brandid}.png`;

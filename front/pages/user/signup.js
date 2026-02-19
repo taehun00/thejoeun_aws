@@ -29,7 +29,7 @@ export default function SignupPage() {
   useEffect(() => {
     if (success) {
       message.success("회원가입이 성공적으로 완료되었습니다.");
-      router.push("user/login");
+      router.push("/user/login");
       dispatch(resetAuthState());
     }
   }, [success, router, dispatch]);

@@ -5,6 +5,7 @@ import { Form, Input, Upload, Button, message, Card } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { createAdRequest, updateAdRequest } from '../../reducers/ad/adReducer';
+import { fileUrl } from "../../utils/fileUrl";
 
 const AdWritePage = ({ isEditing = false, currentAd = null, setIsEditing }) => {
   const dispatch = useDispatch();
@@ -38,8 +39,7 @@ const AdWritePage = ({ isEditing = false, currentAd = null, setIsEditing }) => {
 
   // ✅ 최신 광고는 ads[0]이 가장 최근
   const latestAd = ads && ads.length > 0 ? ads[0] : null;
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8484";
-  const imageUrl = latestAd?.imgUrl || (latestAd?.img ? `${API_URL}/upload/${latestAd.img}` : undefined);
+const imageUrl = latestAd?.img ? fileUrl(latestAd.img) : undefined;
 
   return (
     <div style={{ maxWidth: 600, margin: '0 auto' }}>

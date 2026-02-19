@@ -6,6 +6,7 @@ import {
   fetchLatestAdsRequest,
   deleteAdRequest,
 } from "../../reducers/ad/adReducer";
+import { fileUrl } from "../../utils/fileUrl";
 
 export default function AdListPage() {
   const dispatch = useDispatch();
@@ -23,16 +24,13 @@ export default function AdListPage() {
     message.success("광고가 삭제되었습니다."); // 성공 메시지
   };
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8484";
-
   const columns = [
     {
       title: "이미지",
       dataIndex: "img",
       key: "img",
       render: (img, record) => {
-        const imageUrl =
-          record.imgUrl || (img ? `${API_URL}/upload/${img}` : null);
+const imageUrl = img ? fileUrl(img) : null;
         return imageUrl ? (
           <Image src={imageUrl} alt={record.title} width={80} />
         ) : (

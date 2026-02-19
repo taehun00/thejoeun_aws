@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: oauth
   datasource:
     url: jdbc:oracle:thin:@localhost:1521:XE
     username: ${DB_USERNAME}
@@ -27,7 +29,7 @@ spring:
 
   config:
     import: 
-      - optional:application-oauth.yml
+#     - optional:application-oauth.yml
       - optional:file:.env[.properties]
 
 server:

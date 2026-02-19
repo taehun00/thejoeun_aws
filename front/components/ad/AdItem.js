@@ -4,6 +4,7 @@
 // components/ad/AdItem.js
 //import React from 'react';
 import { Card, Button, Typography, Space } from 'antd';
+import { fileUrl } from '../../utils/fileUrl';
 const { Text, Title } = Typography;
 
 /**
@@ -23,13 +24,14 @@ const AdItem = ({ ad, onDelete, onEdit }) => {
 
       <Space align="start" size={16} style={{ width: '100%' }}>
         {/* 이미지 영역 */}
-        {ad.imageUrl && (
-          <img 
-            src={ad.imageUrl} 
-            alt="광고 이미지" 
-            style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 4 }} 
-          />
-        )}
+      {ad.img && (
+        <img 
+          src={fileUrl(ad.img)} 
+          alt="광고 이미지" 
+          style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 4 }} 
+          onError={(e) => { e.currentTarget.style.display = "none"; }}
+        />
+      )}
         
         {/* 텍스트 영역: 제목과 본문 사이의 수직 간격(Space Vertical) */}
         <Space direction="vertical" size={4}>

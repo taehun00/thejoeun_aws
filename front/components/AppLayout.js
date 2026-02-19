@@ -7,6 +7,7 @@ import { useMemo, useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchLatestAdsRequest } from "../reducers/ad/adReducer";
 import { parseJwt } from "../utils/jwt";
+import { fileUrl } from "../utils/fileUrl";
 
 const { Header, Content } = Layout;
 const { useBreakpoint } = Grid;
@@ -97,7 +98,7 @@ export default function AppLayout({ children }) {
     return found ? [found.key] : ["/"];
   }, [router.pathname, menuItems]);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8484";
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
   // ✅ 광고 카드 렌더링 함수 (중복 제거)
   const renderAds = () => (
@@ -110,7 +111,7 @@ export default function AppLayout({ children }) {
         <Row gutter={[8, 8]}>
           {latestAds.map((ad) => {
             const imageUrl =
-              ad.imgUrl || (ad.img ? `${API_URL}/upload/${ad.img}` : null);
+              ad.imgUrl || (ad.img ? fileUrl(ad.img) : null);
 
             return (
               <Col span={24} key={ad.id}>
@@ -123,7 +124,7 @@ export default function AppLayout({ children }) {
                       <img
                         src={imageUrl}
                         alt="광고 이미지" // ✅ 제목 대신 일반 alt 텍스트
-                        style={{ maxHeight: 300, objectFit: "cover" }}
+                        style={{ maxHeight: 200, objectFit: "cover" }}
                       />
                     ) : null
                   }
@@ -189,24 +190,42 @@ export default function AppLayout({ children }) {
       </Drawer>
 
       {/* ✅ Content + 좌우 광고 영역 */}
-      <Content style={{ padding: "16px" }}>
-        <Row gutter={[16, 16]}>
-          {/* ✅ 왼쪽 광고 */}
-          <Col xs={24} md={6} lg={6}>
-            {renderAds()}
-          </Col>
-
-          {/* ✅ 메인 콘텐츠 중앙 */}
-          <Col xs={24} md={12} lg={12}>
-            <div style={{ maxWidth: "100%" }}>{children}</div>
-          </Col>
-
-          {/* ✅ 오른쪽 광고 */}
-          <Col xs={24} md={6} lg={6}>
-            {renderAds()}
-          </Col>
-        </Row>
+      <Content style={{ padding: "28px 16px" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+          {children}
+        </div>
       </Content>
+        {/* 왼쪽 광고 */}
+      {screens.lg && (
+        <div
+          style={{
+            position: "fixed",
+            left: 20,
+            top: 120,
+            width: 140,
+            zIndex: 10,
+          }}
+        >
+          {renderAds()}
+        </div>
+      )}
+
+        {/* 오른쪽 광고 */}
+        {screens.lg && (
+          <div
+            style={{
+              position: "fixed",
+              right: 20,
+              top: 120,
+              width: 140,
+              zIndex: 10,
+            }}
+          >
+            {renderAds()}
+          </div>
+        )}
+
+
     </Layout>
   );
 }
