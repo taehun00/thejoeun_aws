@@ -100,24 +100,20 @@ export default function AdminReportPage() {
         </Select>
       </Space>
 
-      <Spin spinning={loading}>
-        <BoardToggleTable
+<Spin spinning={loading}>
+        {/* ⚡ BoardToggleTable 대신 바로 AntD Table */}
+        <Table
           rowKey="reportId"
           columns={columns}
           dataSource={reports}
-          loading={loading}
-          pageNo={page}
-          total={totalElements}
-          pageSize={size}
-          onChangePage={handlePageChange}
+          pagination={{
+            current: page + 1,
+            pageSize: size,
+            total: totalElements,
+            onChange: handlePageChange,
+          }}
         />
       </Spin>
-
-      <AdminReportHandleModal
-        open={modalOpen}
-        reportId={selectedReportId}
-        onClose={() => setModalOpen(false)}
-      />
     </Card>
   );
 }
