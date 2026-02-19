@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { useRouter } from "next/router";
-import { Card, Space, Select, Spin } from "antd";
+import { Card, Space, Select, Spin, Table } from "antd";
 import { parseJwt } from "../../../utils/jwt";
 import BoardToggleTable from "../../../components/common/BoardToggleTable";
 import AdminReportHandleModal from "../../../components/admin/AdminReportHandleModal";
 import { fetchReportsRequest } from "../../../reducers/admin/reportReducer";
-import { Card, Space, Select, Spin, Table } from "antd";
 
 const { Option } = Select;
 
