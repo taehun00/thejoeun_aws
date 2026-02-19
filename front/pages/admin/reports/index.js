@@ -6,6 +6,7 @@ import { parseJwt } from "../../../utils/jwt";
 import BoardToggleTable from "../../../components/common/BoardToggleTable";
 import AdminReportHandleModal from "../../../components/admin/AdminReportHandleModal";
 import { fetchReportsRequest } from "../../../reducers/admin/reportReducer";
+import { Card, Space, Select, Spin, Table } from "antd";
 
 const { Option } = Select;
 
