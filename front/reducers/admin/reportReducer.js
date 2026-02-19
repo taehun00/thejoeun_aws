@@ -19,16 +19,22 @@ const adminReportSlice = createSlice({
     },
     fetchReportsSuccess: (state, action) => {
       state.loading = false;
-      if (Array.isArray(action.payload)) {
-        state.reports = action.payload;
-        state.page = 1;
-        state.size = action.payload.length;
-        state.totalElements = action.payload.length;
+      const data = action.payload;
+      if (data?.content) {
+        state.reports = data.content;
+        state.page = data.pageable?.pageNumber ?? 0;
+        state.size = data.pageable?.pageSize ?? 10;
+        state.totalElements = data.totalElements ?? data.content.length;
+      } else if (Array.isArray(data)) {
+        state.reports = data;
+        state.page = 0;
+        state.size = data.length;
+        state.totalElements = data.length;
       } else {
-        state.reports = action.payload.content || [];
-        state.page = action.payload.pageable?.pageNumber || 0;
-        state.size = action.payload.size || 10;
-        state.totalElements = action.payload.totalElements || 0;
+        state.reports = [];
+        state.page = 0;
+        state.size = 0;
+        state.totalElements = 0;
       }
     },
     fetchReportsFailure: (state, action) => {
