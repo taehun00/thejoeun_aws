@@ -1,3 +1,4 @@
+// components/admin/AdminReportHandleModal.js
 import { Modal, Form, Input, Select, Button, message } from "antd";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { handleReportRequest } from "../../reducers/admin/reportReducer";
@@ -9,7 +10,7 @@ export default function AdminReportHandleModal({ open, reportId, onClose }) {
   const loading = useSelector(
     (state) => state.adminReport?.loading ?? false,
     shallowEqual
-    );
+  );
 
   const [form] = Form.useForm();
 

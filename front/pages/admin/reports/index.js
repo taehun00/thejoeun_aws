@@ -1,9 +1,9 @@
+// pages/admin/reports/index.js
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { useRouter } from "next/router";
-import { Card, Space, Select, Spin, Table } from "antd";
+import { Card, Space, Select, Spin, Table, Button } from "antd";
 import { parseJwt } from "../../../utils/jwt";
-import BoardToggleTable from "../../../components/common/BoardToggleTable";
 import AdminReportHandleModal from "../../../components/admin/AdminReportHandleModal";
 import { fetchReportsRequest } from "../../../reducers/admin/reportReducer";
 
@@ -76,14 +76,15 @@ export default function AdminReportPage() {
       dataIndex: "details",
       key: "details",
       render: (_, record) => (
-        <a
+        <Button
+          type="link"
           onClick={() => {
             setSelectedReportId(record.reportId);
             setModalOpen(true);
           }}
         >
           상세보기
-        </a>
+        </Button>
       ),
     },
   ];
@@ -100,8 +101,7 @@ export default function AdminReportPage() {
         </Select>
       </Space>
 
-<Spin spinning={loading}>
-        {/* ⚡ BoardToggleTable 대신 바로 AntD Table */}
+      <Spin spinning={loading}>
         <Table
           rowKey="reportId"
           columns={columns}
@@ -114,6 +114,13 @@ export default function AdminReportPage() {
           }}
         />
       </Spin>
+
+      {/* ⚡ 모달 렌더링 */}
+      <AdminReportHandleModal
+        open={modalOpen}
+        reportId={selectedReportId}
+        onClose={() => setModalOpen(false)}
+      />
     </Card>
   );
 }
