@@ -4,7 +4,6 @@ import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { useRouter } from "next/router";
 import { Card, Space, Select, Spin, Table, Button } from "antd";
 import { parseJwt } from "../../../utils/jwt";
-import AdminReportHandleModal from "../../../components/admin/AdminReportHandleModal";
 import { fetchReportsRequest } from "../../../reducers/admin/reportReducer";
 
 const { Option } = Select;
@@ -15,8 +14,6 @@ export default function AdminReportPage() {
 
   const [loginRole, setLoginRole] = useState(null);
   const [type, setType] = useState(null);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedReportId, setSelectedReportId] = useState(null);
 
   // 관리자 권한 확인
   useEffect(() => {
@@ -78,10 +75,7 @@ export default function AdminReportPage() {
       render: (_, record) => (
         <Button
           type="link"
-          onClick={() => {
-            setSelectedReportId(record.reportId);
-            setModalOpen(true);
-          }}
+          onClick={() => router.push(`/admin/reports/${record.reportId}`)}
         >
           상세보기
         </Button>
@@ -114,13 +108,6 @@ export default function AdminReportPage() {
           }}
         />
       </Spin>
-
-      {/* ⚡ 모달 렌더링 */}
-      <AdminReportHandleModal
-        open={modalOpen}
-        reportId={selectedReportId}
-        onClose={() => setModalOpen(false)}
-      />
     </Card>
   );
 }
