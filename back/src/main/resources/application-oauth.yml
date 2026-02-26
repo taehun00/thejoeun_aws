@@ -46,4 +46,7 @@ app:
     redirect-url: http://3.38.218.56/oauth2/callback
     #redirect-url: http://localhost:3000/oauth2/callback
 
- 
+naver:
+  ocr:
+    key: U0VQbkxpRFVxUXBxU1ZzTWxxSGRtYmJmd1JpZGNXV24=
+    url: https://sw1lx124fy.apigw.ntruss.com/custom/v1/49108/9708cbdcb85c65a885847cbced16046f4f0f3a218317f3f725e52ccfe754e92f/general
