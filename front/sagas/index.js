@@ -16,6 +16,12 @@ import adSaga from "./ad/adSaga";
 import testerSaga from "./tester/testerSaga";
 import testerCommentSaga from "./tester/testerCommentSaga";
 
+import execCommentSaga from "./exec/execCommentSaga";
+import execFollowSaga from "./exec/execFollowSaga";
+import execLikeSaga from "./exec/execLikeSaga";
+import execPostSaga from "./exec/execPostSaga";
+import execRetweetSaga from "./exec/execRetweetSaga";
+
 
 export default  function * rootSaga(){
   yield all([
@@ -32,7 +38,13 @@ export default  function * rootSaga(){
     fork(petdiseaseSaga),
     fork(adSaga), 
     fork(testerSaga),
-    fork(testerCommentSaga)
+    fork(testerCommentSaga),
+   
+    fork(execCommentSaga),
+    fork(execFollowSaga),
+    fork(execLikeSaga),
+    fork(execPostSaga),
+    fork(execRetweetSaga),      
   ]);  
 }
 

@@ -14,6 +14,12 @@ import testerReducer from "./tester/testerReducer";
 import reportReducer from "./report/reportReducer";
 import adminReportReducer from "./admin/reportReducer";
 import testerCommentReducer from "./tester/testerCommentReducer";
+import execCommentReducer from "./exec/execCommentReducer";
+import execFollowReducer from "./exec/execFollowReducer";
+import execLikeReducer from "./exec/execLikeReducer";
+import execPostReducer from "./exec/execPostReducer";
+import execRetweetReducer from "./exec/execRetweetReducer";
+
 
 const rootReducer = combineReducers({
   food: foodReducer,
@@ -30,6 +36,13 @@ const rootReducer = combineReducers({
   report: reportReducer,
   adminReport: adminReportReducer,
   testerComment: testerCommentReducer,
+  execComment: execCommentReducer,
+  execFollow: execFollowReducer,
+  execLike: execLikeReducer,
+  execPost: execPostReducer,
+  execRetweet: execRetweetReducer,
+
+
 });
 
 export default rootReducer;

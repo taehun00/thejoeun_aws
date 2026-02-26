@@ -47,18 +47,17 @@ public class NaverOcrService {
         
         body.add("file", new FileSystemResource(imageFile));
         body.add("message", String.format(
-        		
-        	    "{"
-        	  + "\"version\":\"V1\","
-        	  + "\"requestId\":\"%s\","
-        	  + "\"timestamp\":%d,"
-        	  + "\"images\":[{\"name\":\"sample\",\"format\":\"png\"}]"
-        	  + "}",
-        	    java.util.UUID.randomUUID().toString(),
-        	    System.currentTimeMillis()
-        	));
-
-        
+            "{"
+        + "\"version\":\"v1\","
+        + "\"requestId\":\"%s\","
+        + "\"timestamp\":%d,"
+        + "\"lang\":\"ko\","
+        + "\"images\":[{\"name\":\"sample\",\"format\":\"png\"}]"
+        + "}",
+            java.util.UUID.randomUUID().toString(),
+            System.currentTimeMillis()
+        ));
+                
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
         System.out.println("OCR apiUrl = [" + apiUrl + "]");
@@ -70,6 +69,8 @@ public class NaverOcrService {
                 String.class
         ); 
         
+        System.out.println("OCR STATUS = " + response.getStatusCode());
+            System.out.println("OCR BODY = " + response.getBody());
         
         //변환 - {"x":150.0,"y":267.0}]},"inferText":"RENAL",    // [inferText]만 추출
         //[images[배열0] -> fields[배열i] ->inferText(문자열text)]

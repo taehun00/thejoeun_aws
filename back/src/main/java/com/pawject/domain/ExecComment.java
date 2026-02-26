@@ -19,8 +19,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 
-/**
- * 운동SNS 댓글 엔티티
+/***
+ * 댓글 엔티티
  */
 @Entity   //JPA 엔티티 선언
 @Table(name= "EXECCOMMENTS")
@@ -28,14 +28,14 @@ import lombok.Setter;
 public class ExecComment {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE , generator = "execcomments_seq")  //시퀀스 사용
-	@SequenceGenerator(name = "EXECCOMMENTS_SEQ", sequenceName = "EXECCOMMENTS_SEQ" , allocationSize = 1) 
+	@GeneratedValue(strategy = GenerationType.SEQUENCE , generator = "execcomment_seq")  //시퀀스 사용
+	@SequenceGenerator(name = "execcomment_seq", sequenceName = "EXECCOMMENT_SEQ" , allocationSize = 1) 
 	private Long id; //PK
 	
-	@Column(nullable = false , name="CREATEDAT")
+	@Column(nullable = false , name="CREATED_AT")
 	private LocalDateTime createdAt; // 생성일시
 	
-	@Column(nullable = false , name="UPDATEDAT")
+	@Column(nullable = false , name="UPDATED_AT")
 	private LocalDateTime updatedAt; // 수정일시
 
 	@Column
@@ -62,8 +62,8 @@ public class ExecComment {
 	private User user; //작성자
 	
 	@ManyToOne
-	@JoinColumn( name="EXECPOSTID" , nullable = false)
-	private ExecPost execPost;   // 어떤 게시글에 달린 댓글
+	@JoinColumn( name="EXECPOST_ID" , nullable = false)
+	private ExecPost post;   // 어떤 게시글에 달린 댓글
 	
 }
 

@@ -10,11 +10,9 @@ import com.pawject.domain.ExecComment;
 
 @Repository  //★
 public interface ExecCommentRepository extends JpaRepository<ExecComment, Long> { //Entity , PK ★
-	//특정게시글의 삭제되지 않은 댓글 목록 조회 
-	List<ExecComment> findByExecPost_PostidAndDeletedFalse(Long execPost); // Comment 엔티티 post필드 확인, 그 안에 id가 매핑
-	
-	//삭제되지 않은 댓글 수 집계
-	 long countByExecPost_PostidAndDeletedFalse(Long postid);// Comment 엔티티 post필드 확인, 그 안에 id가 매핑
+	List<ExecComment> findByPost_IdAndDeletedFalse(Long postId);
+
+	long countByPost_IdAndDeletedFalse(Long postId);
 }
 
 /*

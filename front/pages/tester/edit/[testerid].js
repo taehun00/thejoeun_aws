@@ -141,7 +141,7 @@ export default function TesterEditPage() {
           mode={formMode}
           isEdit={true}
           initialValues={dto}
-          categoryOptions={["공지", "모집", "모집완료"]}
+          categoryOptions={["공지", "모집중", "모집완료"]}
           onSubmit={onSubmit}
           loading={updateLoading}
         />

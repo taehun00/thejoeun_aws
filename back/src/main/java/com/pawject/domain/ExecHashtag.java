@@ -19,16 +19,16 @@ import lombok.Setter;
 @Getter  @Setter 
 public class ExecHashtag {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE , generator = "exechashtags_seq")  //시퀀스 사용
-	@SequenceGenerator(name = "exechashtags_seq", sequenceName = "EXECHASHTAGS_SEQ" , allocationSize = 1) 
+	@GeneratedValue(strategy = GenerationType.SEQUENCE , generator = "exechashtag_seq")  //시퀀스 사용
+	@SequenceGenerator(name = "exechashtag_seq", sequenceName = "EXECHASHTAG_SEQ" , allocationSize = 1) 
 	private Long id; //PK
 	
 	@Column(length=200 , nullable=false , unique=true)
 	private String name;
  
 	////// 해쉬태그는 여러개의 글에서 사용가능하다
-	@ManyToMany(mappedBy = "execHashtags")
-	private  List<ExecPost> execPosts = new ArrayList<>();   // 어떤 게시글들이 이 해쉬태그를 쓰는지	
+	@ManyToMany(mappedBy = "hashtags")
+	private  List<ExecPost> posts = new ArrayList<>();   // 어떤 게시글들이 이 해쉬태그를 쓰는지	
 }
 
 

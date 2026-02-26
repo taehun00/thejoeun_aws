@@ -74,7 +74,6 @@ public class SecurityConfig {
             	    	    "/api/test/openai/**",
 
             	    	    // ⭐ 공개 게시판 API 추가
-            	    	    "/api/ads/**",
             	    	    "/api/petfoodsearcher/**",
             	    	    "/api/petdisease/**",
             	    	    "/api/exec/**",
@@ -83,14 +82,16 @@ public class SecurityConfig {
             	    	    "/api/faqBoard/**"
             	    	).permitAll()
 
-            	    .requestMatchers(HttpMethod.GET, "/api/posts").permitAll()
-            	    .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
-            	    .requestMatchers(HttpMethod.GET, "/api/posts/search/hashtag").permitAll()
-            	    .requestMatchers("/api/posts/paged").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/ads/**").permitAll()
 
-            	    .requestMatchers("/api/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/posts").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/posts/search/hashtag").permitAll()
+                        .requestMatchers("/api/posts/paged").permitAll()
 
-            	    .anyRequest().permitAll()
+                        .requestMatchers("/api/**").authenticated()
+
+                        .anyRequest().permitAll()
             	)
 
             // Oauth2 로그인은 소셜로그인 전용
@@ -111,7 +112,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
  
-        configuration.setAllowedOriginPatterns(List.of("http://localhost:3000", "http://13.236.66.10", "http://3.38.218.56"));    //★ Front 포트번호
+        configuration.setAllowedOriginPatterns(List.of("http://localhost:3000", "http://13.236.66.10", "3.38.218.56"));    //★ Front 포트번호
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));

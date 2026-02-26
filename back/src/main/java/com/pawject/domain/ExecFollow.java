@@ -18,23 +18,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * 운동 SNS 팔로우 엔티티
- */
-
 @Entity    
 @Table(
     name= "EXECFOLLOWS",
-    uniqueConstraints = @UniqueConstraint(columnNames = {"FOLLOWERID", "FOLLOWEEID"}) // ★ 유니크 제약조건 추가
+    uniqueConstraints = @UniqueConstraint(columnNames = {"FOLLOWER_ID", "FOLLOWEE_ID"}) // ★ 유니크 제약조건 추가
 )
 @Getter  @Setter  @NoArgsConstructor
 public class ExecFollow {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE , generator = "execfollows_seq")  // 시퀀스 사용
-    @SequenceGenerator(name = "execfollows_seq", sequenceName = "EXECFOLLOWS_SEQ" , allocationSize = 1) 
+    @GeneratedValue(strategy = GenerationType.SEQUENCE , generator = "execfollow_seq")  // 시퀀스 사용
+    @SequenceGenerator(name = "execfollow_seq", sequenceName = "EXECFOLLOW_SEQ" , allocationSize = 1) 
     private Long id; // PK
     
-    @Column(nullable = false , name="CREATEDAT")
+    @Column(nullable = false , name="CREATED_AT")
     private LocalDateTime createdAt; // 생성일시
 
     @PrePersist
@@ -42,21 +38,20 @@ public class ExecFollow {
         this.createdAt = LocalDateTime.now(); 
     }
     
-
     public ExecFollow(User follower, User followee) {
-		this.follower = follower;
-		this.followee = followee;
-	}
+        super();
+        this.follower = follower;
+        this.followee = followee;
+    } 
     
-	@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="FOLLOWERID" ,nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="FOLLOWER_ID" ,nullable = false)
     private User follower;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="FOLLOWEEID" ,nullable = false)
+    @JoinColumn(name="FOLLOWEE_ID" ,nullable = false)
     private User followee;
 }
-
 
 /*
 팔로워: 나를 구독, 내팬

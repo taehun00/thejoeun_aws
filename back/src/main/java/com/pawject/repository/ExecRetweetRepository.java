@@ -14,50 +14,50 @@ import com.pawject.domain.ExecRetweet;
 
 public interface ExecRetweetRepository extends JpaRepository<ExecRetweet, Long> {
 
-    // ✅ 특정 유저의 특정 게시글 리트윗 조회
-    @Query("SELECT r FROM ExecRetweet r WHERE r.user.userId = :userId AND r.originalPost.postid = :postId")
-    Optional<ExecRetweet> findByUserAndOriginalPost(@Param("userId") Long userId, @Param("postId") Long postId);
+    // 특정 유저의 특정 게시글 리트윗 조회
+    @Query("SELECT r FROM ExecRetweet r WHERE r.user.userId = :userId AND r.originalPost.id = :postId")
+    Optional<ExecRetweet> findByUserAndOriginalPost(@Param("userId") Long userId,
+                                                    @Param("postId") Long postId);
 
-    // ✅ 중복 리트윗 방지
-    @Query("SELECT COUNT(r) FROM ExecRetweet r WHERE r.user.userId = :userId AND r.originalPost.postid = :postId")
-    long countByUserAndOriginalPost(@Param("userId") Long userId, @Param("postId") Long postId);
+    // 중복 리트윗 방지
+    @Query("SELECT COUNT(r) FROM ExecRetweet r WHERE r.user.userId = :userId AND r.originalPost.id = :postId")
+    long countByUserAndOriginalPost(@Param("userId") Long userId,
+                                    @Param("postId") Long postId);
 
-    // ✅ 리트윗 취소
+    // 리트윗 취소
     @Modifying
     @Transactional
-    @Query("DELETE FROM ExecRetweet r WHERE r.user.userId = :userId AND r.originalPost.postid = :postId")
-    void deleteByUserAndOriginalPost(@Param("userId") Long userId, @Param("postId") Long postId);
+    @Query("DELETE FROM ExecRetweet r WHERE r.user.userId = :userId AND r.originalPost.id = :postId")
+    void deleteByUserAndOriginalPost(@Param("userId") Long userId,
+                                     @Param("postId") Long postId);
 
-    // ✅ 특정 게시글의 리트윗 수 집계
-    long countByOriginalPost_Postid(Long postId);
+    // 특정 게시글 리트윗 수
+    long countByOriginalPost_Id(Long postId);
 
-    // ✅ 특정 유저가 리트윗한 글 목록 조회
-    @Query("SELECT r.originalPost.postid FROM ExecRetweet r WHERE r.user.userId = :userId")
+    // 특정 유저가 리트윗한 글 ID 목록
+    @Query("SELECT r.originalPost.id FROM ExecRetweet r WHERE r.user.userId = :userId")
     List<Long> findOriginalPostIdsByUserId(@Param("userId") Long userId);
 
-    // ✅ 내가 리트윗한 글 페이징 조회 (Oracle 11g Native Paging)
+
+    // 내가 리트윗한 글 페이징 (Oracle 11g)
     @Query(
-        value =
-            "SELECT * FROM ( " +
-            "   SELECT sn.*, ROWNUM AS rnum " +
-            "   FROM ( " +
-            "       SELECT sns.* " +
-            "       FROM EXECSNS sns " +
-            "       WHERE sns.POSTID IN ( " +
-            "           SELECT DISTINCT r.ORIGINAL_POST_ID " +
-            "           FROM EXECRETWEETS r " +
-            "           WHERE r.USERID = :userId " +
-            "       ) " +
-            "       AND sns.DELETED = 0 " +
-            "       ORDER BY sns.CREATEDAT DESC " +
-            "   ) sn " +
-            ") " +
-            "WHERE rnum BETWEEN :start AND :end",
-        nativeQuery = true
+      value = "SELECT * FROM ( " +
+              "SELECT p.*, ROWNUM AS rnum " +
+              "FROM ( " +
+              "   SELECT po.* " +
+              "   FROM EXECPOSTS po " +
+              "   WHERE po.ID IN ( " +
+              "       SELECT DISTINCT r.ORIGINAL_POST_ID " +
+              "       FROM EXECRETWEETS r " +
+              "       WHERE r.USERID = :userId " +
+              "   ) AND po.DELETED = 0 " +
+              "   ORDER BY po.CREATED_AT DESC " +
+              ") p " +
+              ") " +
+              "WHERE rnum BETWEEN :start AND :end",
+      nativeQuery = true
     )
-    List<ExecPost> findRetweetedPostsWithPaging(
-        @Param("userId") Long userId,
-        @Param("start") int start,
-        @Param("end") int end
-    );
+    List<ExecPost> findRetweetedPostsWithPaging(@Param("userId") Long userId,
+                                                @Param("start") int start,
+                                                @Param("end") int end);
 }

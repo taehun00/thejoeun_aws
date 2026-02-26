@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
 import { Card, Button, Spin, message } from "antd";
-
+import { fileUrl } from "../../utils/fileUrl";
 export default function PetDetailPage() {
   const router = useRouter();
   const { petId } = router.query;
@@ -40,7 +40,7 @@ export default function PetDetailPage() {
       <p>성별: {pet.pgender}</p>
 
       <img
-        src={`http://localhost:8484/uploads/${pet.imageUrl || "default.png"}`}
+        src={fileUrl(pet.imageUrl || "default.png")}
         alt={pet.petName}
         style={{ width: 200, marginTop: 10 }}
       />

@@ -18,17 +18,17 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity    
-@Table(name= "EXECPOSTLIKES",
-	uniqueConstraints = @UniqueConstraint( columnNames = {"APP_USER_ID" , "POST_ID"} )
+@Table(name= "EXECPOST_LIKES",
+	uniqueConstraints = @UniqueConstraint( columnNames = {"USERID" , "EXECPOST_ID"} )
 )
 @Getter  @Setter @NoArgsConstructor
 public class ExecPostLike {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE , generator = "execpostlikes_seq")  //시퀀스 사용
-	@SequenceGenerator(name = "execpostlikes_seq", sequenceName = "EXECPOSTLIKES_SEQ" , allocationSize = 1) 
+	@GeneratedValue(strategy = GenerationType.SEQUENCE , generator = "execpost_like_seq")  //시퀀스 사용
+	@SequenceGenerator(name = "execpost_like_seq", sequenceName = "EXECPOST_LIKE_SEQ" , allocationSize = 1) 
 	private Long id; //PK
 	
-	@Column(nullable = false , name="CREATEDAT")
+	@Column(nullable = false , name="CREATED_AT")
 	private LocalDateTime createdAt; // 좋아요 누른 시점
 
 		 
@@ -37,21 +37,19 @@ public class ExecPostLike {
 	private User user;  // 좋아요 누른 사람
 	
 	@ManyToOne  
-	@JoinColumn(name="EXECPOSTID" , nullable = false)  // POST_ID라는 외래키(FK)  
-	private ExecPost execPost; // 좋아요 대상 게시글
+	@JoinColumn(name="EXECPOST_ID" , nullable = false)  // POST_ID라는 외래키(FK)  
+	private ExecPost post; // 좋아요 대상 게시글
 	
 	@PrePersist
 	void onCreate() {
 		this.createdAt = LocalDateTime.now(); 
 	}
 
-	public ExecPostLike(User user, ExecPost execPost) {
+	public ExecPostLike(User user, ExecPost post) {
 		super();
 		this.user = user;
-		this.execPost = execPost;
+		this.post = post;
 	}
-
-
 	
 }
 

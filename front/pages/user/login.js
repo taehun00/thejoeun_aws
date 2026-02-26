@@ -53,7 +53,7 @@ window.location.href = `http://13.236.66.10/oauth2/authorization/${provider}`;
             </Form>
 
             {/* 소셜 로그인 버튼 */}
-            <div style={{ marginTop: 20, textAlign: "center" }}>
+            {/* <div style={{ marginTop: 20, textAlign: "center" }}>
               <img
                 src="/images/google.png"
                 alt="Google Login"
@@ -76,7 +76,7 @@ window.location.href = `http://13.236.66.10/oauth2/authorization/${provider}`;
                 style={{ cursor: "pointer", width: "200px", marginBottom: "10px" }}
                 onClick={() => handleSocialLogin("naver")}
               />
-            </div>
+            </div> */}
           </>
         ) : (
           <div style={{ textAlign: "center" }}>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import api from "../../api/axios";
 import { Button, Card, List, Spin, message } from "antd";
 import { useRouter } from "next/router";
-
+import { fileUrl } from "../../utils/fileUrl";
 export default function MyPage() {
   const [user, setUser] = useState(null);
   const [pets, setPets] = useState([]);
@@ -50,8 +50,8 @@ export default function MyPage() {
           <>
           <div style={{ display: "flex", alignItems: "center", marginBottom: 10 }}>
             <img
-              src={fileUrl(`userimg/${user?.ufile}`) || fileUrl("userimg/default.png")}
-              alt={user?.nickname || "user"}
+              src={fileUrl(user.ufile || "default.png")}
+              alt={user.nickname}
               style={{ width: 80, height: 80, borderRadius: "50%", marginRight: 15 }}
             />
             </div>
@@ -85,8 +85,8 @@ export default function MyPage() {
                 <p>나이: {pet.page}</p>
                 <p>성별: {pet.pgender}</p>
                 <img
-                  src={fileUrl(`petimg/${pet?.pFile}`) || fileUrl("petimg/default.png")}
-                  alt={pet?.petName || "pet"}
+                   src={fileUrl(pet.imageUrl|| "default.png")}
+                  alt={pet.petName}
                   style={{ width: 150, marginTop: 10 }}
                 />
                 <div style={{ marginTop: 15 }}>

@@ -1,8 +1,9 @@
 spring:
   profiles:
-    active: oauth
+    active: private
+
   datasource:
-    url: jdbc:oracle:thin:@localhost:1521:XE
+    url: jdbc:oracle:thin:@localhost:1521:xe
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: oracle.jdbc.OracleDriver
@@ -28,10 +29,9 @@ spring:
       timeout: 2000
 
   config:
-    import: 
-#     - optional:application-oauth.yml
-      - optional:file:.env[.properties]
-
+    import:
+      - optional:application-oauth.yml
+      - optional:file:.env[.properties] 
 server:
   port: 8080
 
@@ -52,23 +52,16 @@ jwt:
   prefix: Bearer
 
 file:
-  upload-path: /home/ubuntu/app/back/build/libs/upload
-  upload-dir: /home/ubuntu/app/back/build/libs/upload
+  upload-dir: /home/ubuntu/app/back/build/libs/uploads
+  upload-path: /home/ubuntu/app/back/build/libs/uploads
 
 
-app:
-  oauth2:
-    redirect-url: http://3.38.218.56/oauth2/callback
-    #redirect-url: http://localhost:3000/oauth2/callback
-
-## 개인 api 오류 방지용 - 빈값 넣어주세요 (공용)
 openai:
   api:
     key:
-      hj: ""
+      hj: ${OPENAI_API_KEY_HJ}
 
 naver:
   ocr:
-    key: ""
-    url: ""
-
+    key: ${NAVER_OCR_KEY}
+    url: ${NAVER_OCR_URL}
