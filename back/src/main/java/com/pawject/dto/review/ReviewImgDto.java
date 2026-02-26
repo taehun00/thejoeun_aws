@@ -1,5 +1,7 @@
 package com.pawject.dto.review;
 
+import java.sql.Date;
+
 import lombok.Data;
 
 @Data
@@ -7,7 +9,8 @@ public class ReviewImgDto {
 	private int reviewimgid;
 	private int reviewid;
 	private String reviewimgname;
-	private String createdat;
+	private Date createdat;
+
 	
 
 }

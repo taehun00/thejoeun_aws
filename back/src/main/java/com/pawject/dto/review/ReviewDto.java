@@ -1,5 +1,6 @@
 package com.pawject.dto.review;
 
+import java.sql.Date;
 import java.util.List;
 
 import lombok.Data;
@@ -7,16 +8,15 @@ import lombok.Data;
 @Data
 public class ReviewDto {
 	//리뷰테이블 구성
-	 private int reviewid;
-	 private int userid;
-	 private int brandid;
-	 private int foodid;
-	 private String reviewimg;
-	 private int rating;
-	 private String title;
-	 private String reviewcomment;
-	 private String createdat;
-	 private String updatedat;
+    private Integer reviewid;
+    private Integer userid;
+    private Integer brandid;
+    private Integer foodid;
+    private Integer rating;
+    private String title;
+    private String reviewcomment;
+    private Date createdat;
+    private Date updatedat;
 	 
 	 //조인
 	 private String nickname;
